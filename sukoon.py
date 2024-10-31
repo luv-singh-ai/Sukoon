@@ -3,16 +3,27 @@ from pydantic import BaseModel, Field
 from langgraph.graph.message import AnyMessage, add_messages
 from typing import Literal, Annotated
 from langchain_core.prompts import ChatPromptTemplate
-from langgraph.graph import StateGraph, START, END
+from langgraph.graph import StateGraph, START, END, MessagesState
 from langgraph.checkpoint.memory import MemorySaver
 from typing import TypedDict, List
 from openai import OpenAI
 import os 
 from langchain_openai import ChatOpenAI
-import yaml
+import yaml, uuid
+from langgraph.store.memory import InMemoryStore
+from typing_extensions import TypedDict
+from langchain_core.runnables import RunnableConfig
+from langgraph.store.base import BaseStore
+
+# if want to use claude sonnet
+# from langchain_anthropic import ChatAnthropic
+# model = ChatAnthropic(model="claude-3-5-sonnet-20240620")
 
 from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv())
+
+# define memory object
+in_memory_store = InMemoryStore()
 
 # Define the state
 class State(TypedDict):
@@ -60,17 +71,62 @@ def route_query(state: State):
     resp = question_router.invoke({"input": last_message})
     return resp.route
 
-def run_conversational_agent(state: State):
+def run_conversational_agent(state: State, store: BaseStore):
     print("Running conversational agent")
-    convo_model = conversational_prompt | model
-    response = convo_model.invoke(state["messages"])
+    namespace = ("memories", "123")
+    memories = store.search(namespace)
+    info = "\n".join([d.value["data"] for d in memories])
+    system_msg = f"{conversational_prompt} \n Take into account these past conversations: {info}"
+    response = model.invoke(
+        [{"type": "system", "content": system_msg}] + state["messages"]
+    )
+    # new_conversational_prompt = f"{conversational_prompt} \n Take into account these past conversation into account: {info}"
+    # convo_model = new_conversational_prompt | model
+    # response = convo_model.invoke(state["messages"])
+    
+    # Store new memories if the user asks the model to remember
+    last_message = state["messages"][-1]
+    if "remember" in last_message.content.lower():
+        memory = str(response)
+        store.put(namespace, str(uuid.uuid4()), {"data": memory})
     return {"messages": response}
 
-def run_suicide_prevention_agent(state: State):
+def run_suicide_prevention_agent(state: State, store: BaseStore):
     print("Running suicide prevention agent")
+    namespace = ("memories", "234")
+    memories = store.search(namespace)
+    info = "\n".join([d.value["data"] for d in memories])
+    new_suicide_prevention_prompt = f"{suicide_prevention_prompt} \n Take into account these past conversation into account: {info}"
     concern_model = suicide_prevention_prompt | model
     response = concern_model.invoke(state["messages"])
+    
+    # Store new memories if the user asks the model to remember
+    last_message = state["messages"][-1]
+    if "remember" in last_message.content.lower():
+        memory = str(response)
+        store.put(namespace, str(uuid.uuid4()), {"data": memory})
     return {"messages": response}
+
+# # NOTE: we're passing the Store param to the node --
+# # this is the Store we compile the graph with
+# def call_model(state: MessagesState, config: RunnableConfig, *, store: BaseStore):
+#     # user_id = config["configurable"]["user_id"]
+#     namespace = ("memories", 1234)
+#     memories = store.search(namespace)
+#     info = "\n".join([d.value["data"] for d in memories])
+#     prompt_here = "You are a helpful assistant talking to the user"
+#     system_msg = f"{prompt_here} User info: {info}"
+
+#     # Store new memories if the user asks the model to remember
+#     last_message = state["messages"][-1]
+#     if "remember" in last_message.content.lower():
+#         memory = "User name is Bob"
+#         store.put(namespace, str(uuid.uuid4()), {"data": memory})
+
+#     response = model.invoke(
+#         [{"type": "system", "content": system_msg}] + state["messages"]
+#     )
+#     return {"messages": response}
 
 # Create the graph
 workflow = StateGraph(State)
@@ -93,7 +149,8 @@ workflow.add_edge("suicide_prevention", END)
 
 # Compile the graph
 memory = MemorySaver()
-graph = workflow.compile(checkpointer=memory)
+# graph = workflow.compile(checkpointer=memory)
+graph = workflow.compile(checkpointer=memory, store=in_memory_store)
 
 # Function to run a conversation turn
 def chat(message: str, config: dict):
