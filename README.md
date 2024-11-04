@@ -31,7 +31,7 @@ Project Sukoon aims to build open-source solutions and standards for using AI to
 3. Shifted to [AutoGen framework](https://microsoft.github.io/autogen/docs/tutorial/introduction/) based on expert consultation
 4. Currently addressing web UI issues and agent loop problems with AutoGen
 5. Planning to create API endpoints for LangGraph and integrate with WhatsApp API
-6. Conducting user testing using Gooey.ai, following the logic used in AutoGen and LangGraph prompts
+6. Iterated and added more agents to the pipeline
 
 [Watch the video](https://drive.google.com/file/d/1zFL8nz0d8aqzHxJhFU0h-ScDdFaSkPeT/view?usp=drive_link)
 
