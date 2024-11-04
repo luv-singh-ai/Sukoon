@@ -2,9 +2,9 @@ name: CI/CD
 
 on:
   push:
-    branches: [ main ]
+    branches: [ langgraph ]
   pull_request:
-    branches: [ main ]
+    branches: [ langgraph ]
 
 jobs:
   test:
