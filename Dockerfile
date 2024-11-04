@@ -1,26 +1,48 @@
-# Use an official Python runtime as a parent image
-FROM python:3.10-slim
+# # Use an official Python runtime as a parent image
+# FROM python:3.9
 
-# Set the working directory in the container
+# WORKDIR /app
+
+# COPY requirements.txt .
+# RUN pip install --no-cache-dir -r requirements.txt
+
+# COPY . .
+
+# # Make the tests directory available
+# COPY tests/ /app/tests/
+
+# CMD ["uvicorn", "sukoon_api:app", "--host", "127.0.0.1", "--port", "8001"]
+
+FROM python:3.9-slim
+
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
-COPY . /app
-
-# Install any needed packages specified in requirements.txt
-COPY requirements.txt /app/
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Install additional system dependencies
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
+    python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Make port 8000 available to the world outside this container
-EXPOSE 8000
+# Copy requirements first to leverage Docker cache
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Define environment variable
-# ENV NAME World
+# Copy project files
+COPY . .
 
-# Run sukoon_api.py when the container launches
-CMD ["uvicorn", "sukoon_api:app", "--host", "0.0.0.0", "--port", "8000"]
+# Copy test files
+COPY tests/ /app/tests/
+
+# Create directory for YAML files
+RUN mkdir -p /app/prompts
+
+# Copy prompts.yaml file
+COPY prompts/prompts.yaml /app/prompts/
+
+# Environment variables will be provided at runtime
+ENV PYTHONPATH=/app
+ENV HOST=127.0.0.1
+ENV PORT=8001
+
+# Run the application
+CMD ["python", "sukoon.py"]
