@@ -12,10 +12,10 @@ app = FastAPI(title="Sukoon", description="API for the Sukoon mental health supp
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://sukoon-latest.vercel.app", "http://localhost:3000"],  # Add your Vercel domain
+    allow_origins=["*"],  # Allows all origins
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
 )
 
 class SukoonRequest(BaseModel):
@@ -36,4 +36,4 @@ async def root():
     return {"message": "Welcome to the Sukoon API. Use the /query endpoint to interact with the system."}
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8001)  # Change host to "0.0.0.0" to allow external access
+    uvicorn.run(app, host = "127.0.0.1", port = 8001)

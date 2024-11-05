@@ -13,7 +13,6 @@ function App() {
 
   useEffect(scrollToBottom, [messages]);
 
-  const API_URL = process.env.REACT_APP_API_URL || 'https://8ce5-122-176-193-173.ngrok-free.app';
   const handleSend = async () => {
     if (input.trim() === '') return;
 
@@ -22,7 +21,7 @@ function App() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/query`, {
+      const response = await fetch('http://127.0.0.1:8001/query', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -31,6 +30,7 @@ function App() {
       });
 
       const data = await response.json();
+      // console.log(data)
       setMessages(prevMessages => [...prevMessages, { text: data.output, user: false }]);
     } catch (error) {
       console.error('Error:', error);
