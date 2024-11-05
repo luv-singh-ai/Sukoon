@@ -1,0 +1,41 @@
+# pyproject.toml
+
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Sukoon"
+version = "0.1.0"
+description = "Sukoon AI mental health support system"
+authors = [
+    { name = "Luv Singh", email = "luv@peopleplus.ai" }
+]
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+keywords = ["mental health AI", "chatbot"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "fastapi>=0.70.0",
+    "uvicorn>=0.15.0",
+    "langgraph",
+    "langchain-community",
+    "langchain-core",
+    "langchain-openai",
+    "langchain",
+    "pytest>=6.2.5",
+    "pytest-cov>=2.12.1",
+    "pytest-html>=3.1.1",
+    "flake8>=3.9.2"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/luv-singh-ai/Sukoon"
+
+[tool.setuptools]
+py-modules = ["sukoon_api"]  # This tells setuptools that sukoon_api.py is a module
