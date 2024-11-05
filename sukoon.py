@@ -15,6 +15,9 @@ from typing_extensions import TypedDict
 from langchain_core.runnables import RunnableConfig
 from langgraph.store.base import BaseStore
 
+# PLEASE READ THIS DOC ON MEMORY
+# https://langchain-ai.github.io/langgraph/concepts/memory/#managing-long-conversation-history
+
 # if want to use claude sonnet
 # from langchain_anthropic import ChatAnthropic
 # model = ChatAnthropic(model="claude-3-5-sonnet-20240620")
