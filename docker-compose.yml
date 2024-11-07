@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  sukoon:
+    build: .
+    ports:
+      - "8001:8001"
+    volumes:
+      - .:/app
+      - ./data:/app/data  # For any data files
+      - ./storage:/app/storage  # For vector store persistence
+    environment:
+      - PYTHONPATH=/app
+      - HOST=0.0.0.0
+      - PORT=8001
+      # Add your other environment variables here
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge
