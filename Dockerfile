@@ -1,18 +1,3 @@
-# # Use an official Python runtime as a parent image
-# FROM python:3.9
-
-# WORKDIR /app
-
-# COPY requirements.txt .
-# RUN pip install --no-cache-dir -r requirements.txt
-
-# COPY . .
-
-# # Make the tests directory available
-# COPY tests/ /app/tests/
-
-# CMD ["uvicorn", "sukoon_api:app", "--host", "127.0.0.1", "--port", "8001"]
-
 FROM python:3.9-slim
 
 WORKDIR /app
@@ -30,10 +15,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy project files
 COPY . .
 
-# Copy test files
-COPY tests/ /app/tests/
-
-# Create directory for YAML files
+# Create directory for YAML files and ensure it exists
 RUN mkdir -p /app/prompts
 
 # Copy prompts.yaml file
@@ -41,8 +23,11 @@ COPY prompts/prompts.yaml /app/prompts/
 
 # Environment variables will be provided at runtime
 ENV PYTHONPATH=/app
-ENV HOST=127.0.0.1
+ENV HOST=0.0.0.0
 ENV PORT=8001
 
-# Run the application
+# Expose the port
+EXPOSE 8001
+
+# Run both the API and the Python script
 CMD ["python", "sukoon.py"]
