@@ -70,10 +70,11 @@ setx OPENAI_API_KEY "your_api_key_here"
 There are few ways you can contribute to Sukoon
 
 - By providing feedback on the POC
+- By helping in testing and evaluation(please find relevant code in `tests` and `evals` folder)
 - By raising issues in the issues section
 - By contributing to the codebase based on the issues
-- Join the Sukoon team by filling the p+ai volunteer form (https://peopleplus.ai/volunteer) and select the Sukoon project.
-- Submit PRs to the respective branches (e.g. 'autogen' or 'langgraph')
+- Join the Sukoon team by filling the p+ai volunteer form ([https://peopleplus.ai/volunteer](https://coda.io/form/Volunteer-with-Us_dU44lQvPaxK?Type%20of%20Person=Volunteer&POC=David%20Menezes)) and select the Sukoon project.
+- Submit PRs to the respective branches (e.g. 'icg' or 'langgraph')
 
 For detailed guidelines, please read the guidelines outlined in CONTRIBUTING.md
 
@@ -85,9 +86,10 @@ e.g Please read the main doc here and feel free to add comments here - https://d
 If you encounter any issues with the project, please create a new issue using the issue template. Provide as much detail as possible to help us understand and resolve the issue.
 
 # Current Challenges
-We have two active discussions:
+We have three active discussions:
 ```
-Develop a PII Removal Module for a Mental Health Care WhatsApp Chatbot
+Develop a PII Removal Module
+Optimizing Sukoon's Evaluation Pipeline
 Improving Central Orchestrator Agent Classification in AutoGen System
 ```
 
@@ -100,7 +102,7 @@ Mental health support in India faces several challenges:
 * Affordability issues
 * Low budget allocation for mental healthcare
 
-# What could a solution look like? (Tentative features) 
+# What could a solution look like? (Future Vision) 
 * Very personal approach with focus on listening and emphasising
 * Available in 22 Indic regional languages, especially on mobile devices
 * Stores the user conversation locally, not on cloud -> ensuring complete privacy
@@ -113,11 +115,11 @@ Mental health support in India faces several challenges:
 
 # Some interesting ideas to try: 
 * Can we gamify the whole conversation? If yes, then how? 
-* Can we nudge users to adopt healthier behaviour? 
+* Can we nudge users to adopt emotionally healthier behaviour? 
 * In particular, we can warn users about what not to do - relying on superstitions, isolation, labelling, and other unhelpful tactics
 * Give positive self-affirmation, create safety plan, etc
 * Can we develop Emotional Intelligence that understands not just emotions, but context behind it
-* Can we detect emotional status ike stress level using voice(like hume) and then support him
+* Can we detect emotional status ike stress level using voice and then provide support
 * Can we create a timeline tracker let’s say six month plan for meditation and track streak
 * Can we give them a phone number they can call to? The bot will mainly listen , empathize and offer safe advice
 
