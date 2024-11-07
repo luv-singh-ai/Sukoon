@@ -1,5 +1,5 @@
 # Project Sukoon: Mental Health Support using AI
-<img src="archive/sukoon_pic.png" alt="Sukoon Pic" width="200" style="display: block; margin: 0 auto;">
+<img src="archive/sukoon_logo.png" alt="Sukoon Pic" width="200" style="display: block; margin: 0 auto;">
 
 ## Open Roles for Tech Tasks 
 
