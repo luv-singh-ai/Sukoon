@@ -226,39 +226,48 @@ class ConversationManager:
         self._init_database()
 
     def _init_database(self):
-        """Initialize SQLite database with updated schema"""
+        # Initialize SQLite database with updated schema
         conn = sqlite3.connect('conversations.db')
         cursor = conn.cursor()
         
-        # Check if table exists
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='conversations'")
-        table_exists = cursor.fetchone() is not None
-        
-        if table_exists:
-        # Check if column exists
-            cursor.execute("PRAGMA table_info(conversations)")
-            columns = [col[1] for col in cursor.fetchall()]
-        
-        # Add missing columns if needed
-        if 'agent_type' not in columns:
-            cursor.execute('ALTER TABLE conversations ADD COLUMN agent_type TEXT')
-        if 'conversation_id' not in columns:
-            cursor.execute('ALTER TABLE conversations ADD COLUMN conversation_id TEXT')
+        try:
+            # Check if table exists
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='conversations'")
+            table_exists = cursor.fetchone() is not None
             
-        else:
-            # Create new table with all columns
-            cursor.execute('''
-                CREATE TABLE conversations (
-                    turn INTEGER,
-                    timestamp TEXT,
-                    student TEXT,
-                    sukoon TEXT,
-                    agent_type TEXT,
-                    conversation_id TEXT
-                )
-            ''')
-        conn.commit()
-        conn.close()
+            if table_exists:
+                # Check if columns exist
+                cursor.execute("PRAGMA table_info(conversations)")
+                columns = [col[1] for col in cursor.fetchall()]
+                
+                # Add missing columns if needed
+                if 'agent_type' not in columns:
+                    cursor.execute('ALTER TABLE conversations ADD COLUMN agent_type TEXT')
+                if 'conversation_id' not in columns:
+                    cursor.execute('ALTER TABLE conversations ADD COLUMN conversation_id TEXT')
+            
+            else:
+                # Create new table with all columns
+                cursor.execute('''
+                    CREATE TABLE conversations (
+                        turn INTEGER,
+                        timestamp TEXT,
+                        student TEXT,
+                        sukoon TEXT,
+                        agent_type TEXT,
+                        conversation_id TEXT
+                    )
+                ''')
+                print("Created new conversations table")
+            
+            conn.commit()
+            print("Database initialization completed successfully")
+            
+        except Exception as e:
+            print(f"Error initializing database: {e}")
+            conn.rollback()
+        finally:
+            conn.close()
     
     def _get_conversation_history(self, limit: int = 3) -> str:
         """Retrieve recent conversation history formatted for context"""
@@ -338,24 +347,143 @@ class ConversationManager:
             return "unknown"
     
     def save_conversation(self, format: str = "sqlite"):
-        if format == "sqlite":
-            conn = sqlite3.connect('conversations.db')
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        
+        if not self.conversation_history:
+            print("No conversation data to save")
+            return None
+            
+        try:
             df = pd.DataFrame(self.conversation_history)
-            df.to_sql("conversations", conn, if_exists='append', index=False)
+            
+            # Save to SQLite
+            if format in ["all", "sqlite"]:
+                try:
+                    conn = sqlite3.connect('conversations.db')
+                    df.to_sql("conversations", conn, if_exists='append', index=False)
+                    conn.commit()
+                    print(f"Saved {len(df)} records to SQLite database")
+                except Exception as e:
+                    print(f"Error saving to SQLite: {e}")
+                finally:
+                    conn.close()
+            
+            # Save to CSV
+            if format in ["all", "csv"]:
+                try:
+                    csv_filename = f"conversations_{timestamp}.csv"
+                    df.to_csv(csv_filename, index=False)
+                    print(f"Saved conversation to {csv_filename}")
+                except Exception as e:
+                    print(f"Error saving to CSV: {e}")
+            
+            # Create backup
+            try:
+                backup_dir = Path("conversation_backups")
+                backup_dir.mkdir(exist_ok=True)
+                backup_file = backup_dir / f"backup_{timestamp}.json"
+                with open(backup_file, 'w') as f:
+                    json.dump(self.conversation_history, f, indent=2)
+                print(f"Created backup at {backup_file}")
+            except Exception as e:
+                print(f"Error creating backup: {e}")
+            
+            return df
+            
+        except Exception as e:
+            print(f"Error in save_conversation: {e}")
+            return None
+
+    @staticmethod
+    def export_database(format: str = "all") -> Dict[str, pd.DataFrame]:
+        """Export database with error handling and multiple format support"""
+        exports = {}
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        
+        try:
+            # Read from SQLite
+            conn = sqlite3.connect('conversations.db')
+            query = """
+                SELECT 
+                    conversation_id,
+                    turn,
+                    timestamp,
+                    student,
+                    sukoon,
+                    agent_type
+                FROM conversations 
+                ORDER BY conversation_id, turn
+            """
+            df = pd.read_sql_query(query, conn)
+            exports['df'] = df
+            
+            if format in ["all", "csv"]:
+                csv_filename = f"all_conversations_{timestamp}.csv"
+                df.to_csv(csv_filename, index=False)
+                print(f"Exported all conversations to {csv_filename}")
+            
+            if format in ["all", "excel"]:
+                excel_filename = f"all_conversations_{timestamp}.xlsx"
+                df.to_excel(excel_filename, index=False)
+                print(f"Exported all conversations to {excel_filename}")
+            
+            # Create analytics summary
+            summary = {
+                'total_conversations': df['conversation_id'].nunique(),
+                'total_messages': len(df),
+                'agent_distribution': df['agent_type'].value_counts().to_dict(),
+                'timestamp_range': (df['timestamp'].min(), df['timestamp'].max())
+            }
+            exports['summary'] = summary
+            
+            print("\nConversation Analytics:")
+            print(f"Total Conversations: {summary['total_conversations']}")
+            print(f"Total Messages: {summary['total_messages']}")
+            print("\nAgent Distribution:")
+            for agent, count in summary['agent_distribution'].items():
+                print(f"{agent}: {count}")
+            
+        except Exception as e:
+            print(f"Error exporting database: {e}")
+        finally:
             conn.close()
         
-        elif format == "json":
-            # Prepare conversation data
-            conversation_data = {
-                "timestamp": datetime.now().isoformat(),
-                "messages": self.conversation_history
-            }
+        return exports
+
+    @staticmethod
+    def analyze_conversation(conversation_id: str) -> pd.DataFrame:
+        """Analyze specific conversation with error handling"""
+        try:
+            conn = sqlite3.connect('conversations.db')
+            query = """
+                SELECT 
+                    turn,
+                    timestamp,
+                    student,
+                    sukoon,
+                    agent_type
+                FROM conversations 
+                WHERE conversation_id = ?
+                ORDER BY turn
+            """
+            df = pd.read_sql_query(query, conn, params=[conversation_id])
             
-            with open(f"conversations_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json", 'w') as f:
-                json.dump(conversation_data, f, indent = 2)
-        else:
-            df = pd.DataFrame(self.conversation_history)
-            df.to_csv(f"conversations_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv", index = False)
+            if df.empty:
+                print(f"No conversation found with ID: {conversation_id}")
+                return None
+                
+            # print(f"\nConversation Analysis for ID: {conversation_id}")
+            # print(f"Total Turns: {len(df)}")
+            # print(f"Agents Used: {df['agent_type'].unique()}")
+            # print(f"Conversation Duration: {pd.to_datetime(df['timestamp'].max()) - pd.to_datetime(df['timestamp'].min())}")
+            
+            return df
+            
+        except Exception as e:
+            print(f"Error analyzing conversation: {e}")
+            return None
+        finally:
+            conn.close()
 
     def run_conversation(self, max_turns: int = 5):
         config = {"configurable": {"thread_id": "1"}}
@@ -385,10 +513,15 @@ class ConversationManager:
             self.conversation_history.append(turn_data)
             
         # Save conversation at the end
-        self.save_conversation()       
+        df = self.save_conversation(format="all")       
         # Optional: Add delay between turns for more natural conversation flow
         # time.sleep(1)
-
+        # Print conversation summary
+        print("\nConversation Summary:")
+        print(f"Total turns: {len(df)}")
+        print(f"Agents used: {df['agent_type'].unique()}")
+        return df
+    
     def analyze_conversation(conversation_id):
         conn = sqlite3.connect('conversations.db')
         query = """
@@ -404,6 +537,9 @@ class ConversationManager:
 if __name__ == "__main__":
     # Initialize and run conversation
     convo = ConversationManager(groq_api_key, groq_model)
-    convo.run_conversation(max_turns=5)
+    conversation_df = convo.run_conversation(max_turns=5)
     # convo.save_conversation(format="sqlite") # or "csv", "json"
+    if conversation_df is not None:
+            conversation_id = conversation_df['conversation_id'].iloc[0]
+            analysis = ConversationManager.analyze_conversation(conversation_id)
 
