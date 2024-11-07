@@ -16,9 +16,11 @@ services:
       # Add your other environment variables here
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
     restart: unless-stopped
 
 networks:
   default:
     driver: bridge
+
+
+# docker not to build, directly use an image 
