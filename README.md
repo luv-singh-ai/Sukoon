@@ -38,7 +38,7 @@ Project Sukoon aims to build open-source solutions and standards for using AI to
 ## Installation
 
 ### Technical Architecture
-![Technical Architecture](archive/tech_arch_2.png)
+![Technical Architecture](archive/tech_arch_latest.png)
 
 This is Langgraph code. Code from AutoGen is in different branch.
 
