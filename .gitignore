@@ -21,6 +21,7 @@ whatsapp-bot
 prompts/prompts.txt
 user_research/sukoon_persona.jpg
 data/synthetic_convo_notebooklm.wav
+Sukoon.egg-info
 
 tests/regression_test.py
 Sukoon.egg-info
