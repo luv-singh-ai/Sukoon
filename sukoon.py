@@ -28,6 +28,12 @@ _ = load_dotenv(find_dotenv())
 # define memory object
 in_memory_store = InMemoryStore()
 
+LANGCHAIN_TRACING_V2=True
+LANGCHAIN_ENDPOINT="https://api.smith.langchain.com"
+LANGCHAIN_API_KEY = os.getenv("LANGCHAIN_API_KEY")
+LANGCHAIN_API_KEY=LANGCHAIN_API_KEY
+LANGCHAIN_PROJECT="default"
+
 # Define the state
 class State(TypedDict):
     messages: Annotated[list[AnyMessage], add_messages]

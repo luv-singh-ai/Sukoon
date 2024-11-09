@@ -7,8 +7,8 @@ services:
       - "8001:8001"
     volumes:
       - .:/app
-      - ./data:/app/data  # For any data files
-      - ./storage:/app/storage  # For vector store persistence
+      # - ./data:/app/data  # For any data files
+      # - ./storage:/app/storage  # For vector store persistence
     environment:
       - PYTHONPATH=/app
       - HOST=0.0.0.0

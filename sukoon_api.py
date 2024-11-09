@@ -35,5 +35,8 @@ async def process_query(request: SukoonRequest):
 async def root():
     return {"message": "Welcome to the Sukoon API. Use the /query endpoint to interact with the system."}
 
+# async def redirect_root_to_docs():
+#     return RedirectResponse("/docs")
+
 if __name__ == "__main__":
     uvicorn.run(app, host = "127.0.0.1", port = 8001)
