@@ -21,7 +21,7 @@ function App() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://127.0.0.1:8001/query', {
+      const response = await fetch("https://sukoon-api.pplus.ai/query", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
