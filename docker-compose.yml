@@ -5,7 +5,7 @@ services:
     image: localhost/sukoon-app:latest  # Use the existing image
     container_name: sukoon-container    # Explicitly name the container
     ports:
-      - "8001:8001"
+      - "8002:8001"
     volumes:
       - .:/app:Z                       # Add :Z for SELinux compatibility
     environment:
@@ -16,8 +16,8 @@ services:
       - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
     restart: unless-stopped
 
-networks:
-  default:
-    driver: bridge
+# networks:
+#   default:
+#     driver: bridge
 
 # docker not to build, directly use an image 
