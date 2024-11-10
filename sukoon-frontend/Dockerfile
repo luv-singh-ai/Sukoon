@@ -7,6 +7,5 @@ COPY package.json /app/sukoon-frontend
 RUN npm install && npm install -g serve
 
 COPY . /app/sukoon-frontend
-# RUN npm run build
-# CMD serve -s build
-CMD npm start
+RUN npm run build
+CMD serve -s build
