@@ -1,24 +1,24 @@
 version: '3.8'
 
 services:
-  sukoon:
-    # image: localhost/sukoon-app:latest  # Use the existing image
+  sukoon-backend:
     build: .
-    container_name: sukoon-container    # Explicitly name the container
     ports:
       - "8002:8001"
     volumes:
-      - .:/app:Z                       # Add :Z for SELinux compatibility
+      - .:/app
+      - ./data:/app/data  # For any data files
+      - ./storage:/app/storage  # For vector store persistence
     environment:
       - PYTHONPATH=/app
       - HOST=0.0.0.0
       - PORT=8001
+      # Add your other environment variables here
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
     restart: unless-stopped
-
-# networks:
-#   default:
-#     driver: bridge
-
-# docker not to build, directly use an image 
+  sukoon-frontend:
+    build: ./sukoon-frontend
+    ports:
+      - "3002:3000"
+    restart: unless-stopped
