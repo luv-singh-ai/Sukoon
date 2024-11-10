@@ -2,7 +2,8 @@ version: '3.8'
 
 services:
   sukoon:
-    image: localhost/sukoon-app:latest  # Use the existing image
+    # image: localhost/sukoon-app:latest  # Use the existing image
+    build: .
     container_name: sukoon-container    # Explicitly name the container
     ports:
       - "8002:8001"
