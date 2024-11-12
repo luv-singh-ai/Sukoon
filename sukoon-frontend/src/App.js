@@ -96,10 +96,10 @@ function App() {
           </div>
         </div>
         <div class="chatConv pt-4 pe-4" style={{ height: "80vh", overflow: "scroll", overflowX: "auto" }}>
-          <div class="col-7 mx-auto" style={{ overflow: "hidden" }}>
+          <div class="col-8 mx-auto" style={{ overflow: "hidden" }}>
             <div>
               {messages.map((message, index) => (
-                <p key={index} className={`small p-2 me-3 my-1 rounded-3 ${message.user ? 'bg-primary text-white userMsg' : 'agentMsg'}`}>{message.text}</p>
+                <div className={`m-4 ${message.user ? 'text-end' : 'text-start'}`} key={index}><span className={`p-2 me-3 my-1 rounded-3 ${message.user ? 'bg-primary text-light': ''}`} style={{display: 'inline-block'}}>{message.text}</span></div>
               ))}
               {isLoading && (
                 <div className="loading-container">
@@ -116,6 +116,7 @@ function App() {
                         class="fa-solid fa-arrow-up"></i>
                   </span>
                 </div>
+              <p style={{textAlign: "center", fontSize: "small"}}>By using Pi, you agree to our <a href="https://peopleplusai.github.io/Sukoon/disclaimer.html" target='_blank' rel="noopener noreferrer">Terms & Conditions</a></p>
               </div>
             </div>
           </div>
