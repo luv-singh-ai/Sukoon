@@ -3,13 +3,7 @@
 langgraph/__pycache__/sukoon_role.cpython-310.pyc
 langgraph/__pycache__/sukoon_role.cpython-310.pyc
 autogen/OAI_CONFIG_LIST
-autogen/.cache/41/cache.db
-autogen/.cache/41/cache.db
 langgraph/__pycache__/sukoon.cpython-310.pyc
-autogen/.cache/41/cache.db
-autogen/.cache/41/cache.db
-autogen/.cache/41/cache.db
-autogen/.cache/41/cache.db
 autogen/autogen_multi_agent/Autogen-UI-main.zip
 OAI_CONFIG_LIST
 /autogen_multi_agent
@@ -25,7 +19,7 @@ Sukoon.egg-info
 
 tests/regression_test.py
 Sukoon.egg-info
-
+backend
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
