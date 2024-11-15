@@ -3,6 +3,12 @@ from pydantic import BaseModel
 from typing import TypedDict, Annotated
 import uvicorn
 
+# from fastapi import Request
+# from fastapi.responses import HTMLResponse
+# from fastapi.templating import Jinja2Templates
+# import json
+# from datetime import datetime
+
 from sukoon import chat
 
 from fastapi.middleware.cors import CORSMiddleware
@@ -40,3 +46,34 @@ async def root():
 
 if __name__ == "__main__":
     uvicorn.run(app, host = "127.0.0.1", port = 8001)
+    
+    
+# for google analytics
+# templates = Jinja2Templates(directory="templates")
+
+# # Track conversation events
+# async def track_conversation_event(conversation_id: str, event_type: str, data: dict):
+#     # Send to Google Analytics
+#     event = {
+#         'conversation_id': conversation_id,
+#         'event_type': event_type,
+#         'timestamp': datetime.utcnow().isoformat(),
+#         'data': data
+#     }
+#     # Log for analysis
+#     print(json.dumps(event))
+
+# @app.post("/chat")
+# async def chat_endpoint(request: Request):
+#     # Your existing chat logic
+#     conversation_id = "unique_id"  # Generate unique ID
+    
+#     # Track conversation start
+#     await track_conversation_event(
+#         conversation_id=conversation_id,
+#         event_type="conversation_start",
+#         data={
+#             'user_id': request.client.host,
+#             'timestamp': datetime.utcnow().isoformat()
+#         }
+#     )
