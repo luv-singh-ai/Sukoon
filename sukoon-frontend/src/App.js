@@ -116,7 +116,7 @@ function App() {
                         class="fa-solid fa-arrow-up"></i>
                   </span>
                 </div>
-              <p style={{textAlign: "center", fontSize: "small"}}>By using this, you give your consent that you've read the <a href="https://peopleplusai.github.io/Sukoon/disclaimer.html" target='_blank' rel="noopener noreferrer">disclaimer.</a></p>
+              <p style={{textAlign: "center", fontSize: "small"}}>By using this, you give your consent that you have read the <a href="https://peopleplusai.github.io/Sukoon/disclaimer.html" target='_blank' rel="noopener noreferrer">disclaimer.</a></p>
               </div>
             </div>
           </div>
