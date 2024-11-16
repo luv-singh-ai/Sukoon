@@ -2,6 +2,7 @@ langgraph
 langchain-community
 langchain-core
 langchain-openai
+langchain-anthropic
 langchain
 fastapi
 uvicorn
@@ -11,6 +12,7 @@ llama-index
 uptrain
 langgraph-checkpoint-sqlite
 langsmith
+portkey-ai
 # langchainhub==0.1.15
 # langchain-openai==0.1.3
 # langchain==0.1.16

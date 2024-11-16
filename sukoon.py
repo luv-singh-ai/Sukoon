@@ -12,6 +12,9 @@ from langgraph.store.memory import InMemoryStore
 from typing_extensions import TypedDict
 from langchain_core.runnables import RunnableConfig
 from langgraph.store.base import BaseStore
+from portkey_ai import Portkey, createHeaders, PORTKEY_GATEWAY_URL
+from portkey_ai.langchain import LangchainCallbackHandler
+from langchain_anthropic import ChatAnthropic
 
 import os
 import yaml, uuid
@@ -24,21 +27,30 @@ from pathlib import Path
 # PLEASE READ THIS DOC ON MEMORY
 # https://langchain-ai.github.io/langgraph/concepts/memory/#managing-long-conversation-history
 
-# if want to use claude sonnet
-# from langchain_anthropic import ChatAnthropic
-# model = ChatAnthropic(model="claude-3-5-sonnet-20240620")
-
 from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv())
 openai_api_key = os.getenv("OPENAI_API_KEY")
+anthropic_api_key = os.getenv("ANTHROPIC_API_KEY")
+LANGCHAIN_API_KEY = os.getenv("LANGCHAIN_API_KEY")
+PORTKEY_API_KEY = os.getenv("PORTKEY_API_KEY")
+PORTKEY_VIRTUAL_KEY = os.getenv("PORTKEY_VIRTUAL_KEY")
+PORTKEY_VIRTUAL_KEY_A = os.getenv("PORTKEY_VIRTUAL_KEY_A")
 # # define memory object
 # in_memory_store = InMemoryStore()
 
-LANGCHAIN_TRACING_V2=True
-LANGCHAIN_ENDPOINT="https://api.smith.langchain.com"
-LANGCHAIN_API_KEY = os.getenv("LANGCHAIN_API_KEY")
-LANGCHAIN_API_KEY=LANGCHAIN_API_KEY
-LANGCHAIN_PROJECT="default"
+# to use ollama via ollama pull llama3.1
+# %pip install -qU langchain-ollama
+# from langchain_ollama import ChatOllama
+# model_o = ChatOllama(
+#     model="llama3.1:405b",
+#     temperature=0.9,
+#     # other params...
+# )
+
+# LANGCHAIN_TRACING_V2=True
+# LANGCHAIN_ENDPOINT="https://api.smith.langchain.com"
+# LANGCHAIN_API_KEY=LANGCHAIN_API_KEY
+# LANGCHAIN_PROJECT="default"
 
 # Define the state
 class State(TypedDict):
@@ -49,10 +61,65 @@ def load_prompts(file_path='prompts.yaml'):
         return yaml.safe_load(file)
 
 prompts = load_prompts()
+
+portkey_handler = LangchainCallbackHandler(
+    api_key=PORTKEY_API_KEY,
+    metadata={
+        "session_id": "session_1",  # Use consistent metadata across your application
+        "agent_id": "Router_Agent",  # Specific to the current agent
+    }
+)
 # Initialize OpenAI model
 # model = llm
-model = ChatOpenAI(model="gpt-4o", temperature=0.9)
+# model = ChatOpenAI(model="gpt-4o", max_tokens=50, temperature=0.9, max_retries=2)
+model = ChatOpenAI(
+    api_key=openai_api_key,
+    model="gpt-4o",
+    max_retries=2,
+    temperature=0.9,
+    max_tokens=50,
+    base_url=PORTKEY_GATEWAY_URL,
+    default_headers=createHeaders(
+        api_key=PORTKEY_API_KEY,
+        virtual_key=PORTKEY_VIRTUAL_KEY, # Pass your virtual key saved on Portkey for any provider you'd like (Anthropic, OpenAI, Groq, etc.). if using this, no need to pass openai api key
+        config = "pc-sukoon-86ab23"
+    ),
+    callbacks=[portkey_handler],
+)
+# max_completion_tokens = 200 for o1 models
 
+# model_a = ChatAnthropic(model="claude-3-5-haiku-20241022", temperature=0.9, api_key=anthropic_api_key, max_tokens = 200, max_retries=2) 
+# to use sonnet 3.5, put claude-3-5-sonnet-20241022 as model
+model_a = ChatOpenAI(
+    api_key=anthropic_api_key, # We'll pass a dummy API key here
+    base_url=PORTKEY_GATEWAY_URL,
+    default_headers=createHeaders(
+        api_key=PORTKEY_API_KEY,
+        virtual_key=PORTKEY_VIRTUAL_KEY_A, # Pass your virtual key saved on Portkey for any provider you'd like (Anthropic, OpenAI, Groq, etc.)
+        provider="anthropic",
+        # anthropic_beta="prompt-caching-2024-07-31", # to cache, add "cache_control": {"type": "ephemeral"} in respective message body
+    ),
+    model="claude-3-5-haiku-20241022",
+    temperature=0.9,
+    max_tokens = 200,
+    max_retries=2,
+)
+
+# TO ADD WEIGHTED FEEDBACK
+# portkey = Portkey(
+#     api_key="PORTKEY_API_KEY"
+# )
+# feedback = portkey.feedback.create(
+#     trace_id="Router_Agent", # similar for other agents
+#     value=1,  # for thumbs up or thumbs down
+#     weight=1,  # Optional
+#     metadata={
+#         # Pass any additional context here like comments, _user and more
+#     }
+# )
+# print(feedback)
+
+# DEFINING THE PROMPT
 
 planner_prompt = ChatPromptTemplate.from_messages([
     ("system", prompts['planner_agent_prompt']),
@@ -102,25 +169,7 @@ def route_query(state: State):
         ] = Field(
             ...,
             description=(
-                "Choose the most appropriate agent based on the user's emotional or psychological needs, inferred from their dialogue: "
-
-                "'conversational' is ideal for users seeking general empathetic interaction, companionship, or simply wishing to engage in casual dialogue. This route aims to provide emotional support through open, non-directive conversation. \n"
-                "Example: A user says, 'I've been feeling a bit lonely lately. I just need someone to talk to about my day.'\n"
-
-                "'suicide_prevention' is critical for users who express thoughts of hopelessness, self-harm, suicidal ideation, or severe emotional distress. This route provides immediate intervention, offering resources and support to de-escalate the crisis. \n"
-                "Example: A user states, 'I feel like no one would care if I were gone. I don't want to keep going anymore.'\n"
-
-                "'anger_management' should be selected for users expressing frustration, irritability, or anger. This route helps the user manage their temper, process their emotions constructively, and reduce the risk of conflict escalation. \n"
-                "Example: A user vents, 'I'm so mad at my boss! He keeps undermining me, and I'm about to explode.'\n"
-
-                "'motivational' is suited for users who feel demotivated, struggle with low self-esteem, or are seeking encouragement to pursue their goals. This route offers positive reinforcement and practical strategies for improving self-worth and maintaining focus. \n"
-                "Example: A user shares, 'I’ve been feeling stuck. Every time I try to work on my project, I lose motivation. What’s the point of even trying?' \n"
-
-                "'dialectical_behavior_therapy' (DBT) should be used for users dealing with intense, fluctuating emotions or feeling emotionally overwhelmed. DBT teaches skills for emotional regulation, distress tolerance, and managing interpersonal relationships. \n"
-                "Example: A user says, 'One moment I’m okay, but then I’m hit with this overwhelming sadness and anger. I don’t know how to control my emotions.'\n"
-
-                "'cognitive_behavioral_therapy' (CBT) is appropriate for users struggling with negative or distorted thinking patterns, self-criticism, or irrational beliefs. CBT helps them reframe unhealthy thoughts into more positive, balanced perspectives. \n"
-                "Example: A user confides, 'I always mess things up. No matter what I do, I feel like a failure, and it’s hard to think any differently.'"
+                "Think step by step and direct to most appropriate agent"
             )
         )
     structured_llm_router = model.with_structured_output(RouteQuery)
@@ -152,37 +201,37 @@ def route_query(state: State):
 # Define all agents
 def run_conversational_agent(state: State):
     print("Running conversational agent")
-    convo_model = conversational_prompt | model
+    convo_model = conversational_prompt | model_a
     response = convo_model.invoke(state["messages"])
     return {"messages": response}
 
 def run_suicide_prevention_agent(state: State):
     print("Running suicide prevention agent")
-    concern_model = suicide_prevention_prompt | model
+    concern_model = suicide_prevention_prompt | model_a
     response = concern_model.invoke(state["messages"])
     return {"messages": response}
 
 def run_anger_management_agent(state: State):
     print("Running anger management agent")
-    anger_model = anger_management_prompt | model
+    anger_model = anger_management_prompt | model_a
     response = anger_model.invoke(state["messages"])
     return {"messages": response}
 
 def run_motivational_agent(state: State):
     print("Running motivational agent")
-    motivation_model = motivational_prompt | model
+    motivation_model = motivational_prompt | model_a
     response = motivation_model.invoke(state["messages"])
     return {"messages": response}
 
 def run_dialectical_behavior_therapy_agent(state: State):
     print("Running dialectical_behavior_therapy agent")
-    dialectical_behavior_therapy_model = dialectical_behavior_therapy_prompt | model
+    dialectical_behavior_therapy_model = dialectical_behavior_therapy_prompt | model_a
     response = dialectical_behavior_therapy_model.invoke(state["messages"])
     return {"messages": response}
 
 def run_cognitive_behavioral_therapy_agent(state: State):
     print("Running cognitive_behavioral_therapy agent")
-    cognitive_behavioral_therapy_model = cognitive_behavioral_therapy_prompt | model
+    cognitive_behavioral_therapy_model = cognitive_behavioral_therapy_prompt | model_a
     response = cognitive_behavioral_therapy_model.invoke(state["messages"])
     return {"messages": response}
 
