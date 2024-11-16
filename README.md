@@ -55,6 +55,7 @@ This is Langgraph code. Code from AutoGen is in different branch.
 Create a .env file with:
 ```
 OPENAI_API_KEY = '<YOUR_OPENAI_API_KEY>' 
+ANTHROPIC_API_KEY = '<ANTHROPIC_API_KEY>'
 LANGCHAIN_API_KEY = '<YOUR_LANGCHAIN_API_KEY>'
 ```
 - Alternatively , try this:
