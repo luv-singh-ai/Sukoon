@@ -1,6 +1,8 @@
 .env
 .DS_Store
+.files
 Sukoon.egg-info
+dist
 langgraph/__pycache__/sukoon_role.cpython-310.pyc
 langgraph/__pycache__/sukoon_role.cpython-310.pyc
 autogen/OAI_CONFIG_LIST
