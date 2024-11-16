@@ -172,37 +172,37 @@ def route_query(state: State):
 # Define all agents
 def run_conversational_agent(state: State):
     print("Running conversational agent")
-    convo_model = conversational_prompt | model # model_a
+    convo_model = conversational_prompt | model_a # model
     response = convo_model.invoke(state["messages"])
     return {"messages": response}
 
 def run_suicide_prevention_agent(state: State):
     print("Running suicide prevention agent")
-    concern_model = suicide_prevention_prompt | model # model_a
+    concern_model = suicide_prevention_prompt | model_a # model
     response = concern_model.invoke(state["messages"])
     return {"messages": response}
 
 def run_anger_management_agent(state: State):
     print("Running anger management agent")
-    anger_model = anger_management_prompt | model # model_a
+    anger_model = anger_management_prompt | model_a # model
     response = anger_model.invoke(state["messages"])
     return {"messages": response}
 
 def run_motivational_agent(state: State):
     print("Running motivational agent")
-    motivation_model = motivational_prompt | model # model_a
+    motivation_model = motivational_prompt | model_a # model
     response = motivation_model.invoke(state["messages"])
     return {"messages": response}
 
 def run_dialectical_behavior_therapy_agent(state: State):
     print("Running dialectical_behavior_therapy agent")
-    dialectical_behavior_therapy_model = dialectical_behavior_therapy_prompt | model # model_a
+    dialectical_behavior_therapy_model = dialectical_behavior_therapy_prompt | model_a # model
     response = dialectical_behavior_therapy_model.invoke(state["messages"])
     return {"messages": response}
 
 def run_cognitive_behavioral_therapy_agent(state: State):
     print("Running cognitive_behavioral_therapy agent")
-    cognitive_behavioral_therapy_model = cognitive_behavioral_therapy_prompt | model # model_a
+    cognitive_behavioral_therapy_model = cognitive_behavioral_therapy_prompt | model_a # model
     response = cognitive_behavioral_therapy_model.invoke(state["messages"])
     return {"messages": response}
 
