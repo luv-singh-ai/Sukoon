@@ -1,8 +1,5 @@
 import { useState } from "react";
-
-const env = await import.meta.env;
-const API_KEY = (env.VITE_SUPABASE_API_KEY);
-const AUTHORIZATION_TOKEN = (env.VITE_SUPABASE_AUTHORIZATION_TOKEN);
+import { SUPABASE_API_KEY, SUPABASE_AUTHORIZATION_TOKEN } from "../utils/envs";
 
 export default function FeedbackOverlay({feedback, setFeedback, likedMessages, setLikedMessages, dislikedMessages, setDislikedMessages}) {
   const [feedbackMessage, setFeedbackMessage] = useState("");
@@ -15,8 +12,8 @@ export default function FeedbackOverlay({feedback, setFeedback, likedMessages, s
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'apikey': API_KEY,
-          'Authorization': AUTHORIZATION_TOKEN,
+          'apikey': SUPABASE_API_KEY,
+          'Authorization': SUPABASE_AUTHORIZATION_TOKEN,
           'Prefer': 'return=minimal'
         },
         body: JSON.stringify({

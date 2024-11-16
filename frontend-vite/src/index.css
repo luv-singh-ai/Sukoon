@@ -6,4 +6,6 @@ body {
   background-image: url("./assets/background.svg");
   background-size: cover;
   background-position:top;
+  width: 100vw;
+  height: 100vh;
 }
