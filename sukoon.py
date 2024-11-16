@@ -14,8 +14,6 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.store.base import BaseStore
 from portkey_ai import Portkey, createHeaders, PORTKEY_GATEWAY_URL
 from portkey_ai.langchain import LangchainCallbackHandler
-
-# pip install -U langchain-anthropic
 from langchain_anthropic import ChatAnthropic
 
 import os
@@ -39,6 +37,15 @@ PORTKEY_VIRTUAL_KEY = os.getenv("PORTKEY_VIRTUAL_KEY")
 PORTKEY_VIRTUAL_KEY_A = os.getenv("PORTKEY_VIRTUAL_KEY_A")
 # # define memory object
 # in_memory_store = InMemoryStore()
+
+# to use ollama via ollama pull llama3.1
+# %pip install -qU langchain-ollama
+# from langchain_ollama import ChatOllama
+# model_o = ChatOllama(
+#     model="llama3.1:405b",
+#     temperature=0.9,
+#     # other params...
+# )
 
 # LANGCHAIN_TRACING_V2=True
 # LANGCHAIN_ENDPOINT="https://api.smith.langchain.com"
