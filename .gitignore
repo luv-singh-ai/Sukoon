@@ -1,8 +1,8 @@
 .env
 .DS_Store
 .files
-frontend-vite
 dist
+frontend-vite/node_modules
 langgraph/__pycache__/sukoon_role.cpython-310.pyc
 langgraph/__pycache__/sukoon_role.cpython-310.pyc
 autogen/OAI_CONFIG_LIST
