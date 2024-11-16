@@ -1,16 +1,12 @@
 .env
 .DS_Store
 .files
-Sukoon.egg-info
+frontend-vite
 dist
 langgraph/__pycache__/sukoon_role.cpython-310.pyc
 langgraph/__pycache__/sukoon_role.cpython-310.pyc
 autogen/OAI_CONFIG_LIST
 langgraph/__pycache__/sukoon.cpython-310.pyc
-autogen/autogen_multi_agent/Autogen-UI-main.zip
-OAI_CONFIG_LIST
-/autogen_multi_agent
-autogen/.cache/41/cache.db
 /__pycache__
 archive/sample_sukoon_code.ipynb
 whatsapp-bot
