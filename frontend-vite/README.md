@@ -50,12 +50,13 @@ yarn install
 
 ### 3. Export environment variables
 
-Export Supabase environment variables.
+Export Supabase and backend URL environment variables.
 
 Using `.env` file:
 ```bash
 VITE_SUPABASE_API_KEY="<API-KEY>"
 VITE_SUPABASE_AUTHORIZATION_TOKEN="<AUTHORIZATION-TOKEN>"
+VITE_BACKEND_ENDPOINT="https://sukoon-api.pplus.ai"
 ```
 
 ### 4. Start the development server

@@ -18,7 +18,7 @@ export default function Messages({
   }, [messages]);
 
   return (
-    <div className="h-full px-[6vw] sm:px-[8vw] lg:px-[10vw] xl:px-[25vw] overflow-y-scroll">
+    <div className="h-[72vh] px-[6vw] sm:px-[8vw] lg:px-[10vw] xl:px-[25vw] pb-12 sm:pb-10 md:pb-8 lg:pb-6 xl-pb-0 overflow-y-scroll">
       {
         messages.map((message, i) => {
           if (message.isResponse !== true) {

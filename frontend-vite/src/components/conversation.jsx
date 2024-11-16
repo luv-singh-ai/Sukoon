@@ -11,16 +11,18 @@ export default function Conversation({
   const [dislikedMessages, setDislikedMessages] = useState([]);
 
   return (
-    <div className="mt-5 relative h-[78vh]">
+    <div className="mt-5">
       {
         Object.keys(feedback).length === 0 ?
           <>
             <Messages dislikedMessages={dislikedMessages} likedMessages={likedMessages}
               messages={messages} setFeedback={setFeedback} isResponseGenerating={isResponseGenerating} />
-            <div className='flex items-end justify-center'>
-              <div className='my-3 w-full md:w-10/12 lg:w-9/12 xl:w-1/2'>
-                <InputForm isResponseGenerating={isResponseGenerating} prompt={prompt}
-                  setPrompt={setPrompt} submitPrompt={submitPrompt} />
+            <div>
+              <div className='h-[10vh] flex items-end justify-center'>
+                <div className='w-full md:w-10/12 lg:w-9/12 xl:w-1/2'>
+                  <InputForm isResponseGenerating={isResponseGenerating} prompt={prompt}
+                    setPrompt={setPrompt} submitPrompt={submitPrompt} />
+                </div>
               </div>
             </div>
           </>
