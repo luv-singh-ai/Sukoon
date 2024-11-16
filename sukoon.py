@@ -81,20 +81,6 @@ model = ChatOpenAI(
 )
 # max_completion_tokens = 200 for o1 models
 
-# TO ADD WEIGHTED FEEDBACK
-# portkey = Portkey(
-#     api_key="PORTKEY_API_KEY"
-# )
-# feedback = portkey.feedback.create(
-#     trace_id="Router_Agent", # similar for other agents
-#     value=1,  # for thumbs up or thumbs down
-#     weight=1,  # Optional
-#     metadata={
-#         # Pass any additional context here like comments, _user and more
-#     }
-# )
-# print(feedback)
-
 # model_a = ChatAnthropic(model="claude-3-5-haiku-20241022", temperature=0.9, api_key=anthropic_api_key, max_tokens = 200, max_retries=2) 
 # to use sonnet 3.5, put claude-3-5-sonnet-20241022 as model
 model_a = ChatOpenAI(
@@ -111,6 +97,22 @@ model_a = ChatOpenAI(
     max_tokens = 200,
     max_retries=2,
 )
+
+# TO ADD WEIGHTED FEEDBACK
+# portkey = Portkey(
+#     api_key="PORTKEY_API_KEY"
+# )
+# feedback = portkey.feedback.create(
+#     trace_id="Router_Agent", # similar for other agents
+#     value=1,  # for thumbs up or thumbs down
+#     weight=1,  # Optional
+#     metadata={
+#         # Pass any additional context here like comments, _user and more
+#     }
+# )
+# print(feedback)
+
+# DEFINING THE PROMPT
 
 planner_prompt = ChatPromptTemplate.from_messages([
     ("system", prompts['planner_agent_prompt']),

@@ -1,0 +1,91 @@
+{
+    "version": "v1.0.0",
+    "entity": {
+        "type": "organisation",
+        "role": "maintainer",
+        "name": "People+AI",
+        "email": "luv@peopleplus.ai",
+        "phone": "9999999999",
+        "description": "Project Sukoon aims to build open-source solutions and standards for using AI to address mental health challenges. Our goal is to apply Digital Public Infrastructure (DPI) knowledge and practices to help professionals explore and understand the latest advancements in AI and their applications to mental health use-cases specific to India.",
+        "webpageUrl": {
+            "url": "https://peopleplus.ai/sukoon",
+            "wellKnown": "https://peopleplus.ai/.well-known/funding-manifest-urls"
+        }
+    },
+    "projects": [{
+        "guid": "sukoon",
+        "name": "Project Sukoon",
+        "description": "An open-source mental health support system using AI to provide accessible mental health resources for Indian users. Features include multilingual support, privacy-focused design, and integration with professional mental health services. The project uses advanced LLM frameworks like LangGraph and AutoGen to create specialized mental health support agents.",
+        "webpageUrl": {
+            "url": "https://sukoon.peopleplus.ai",
+            "wellKnown": "https://sukoon.peopleplus.ai/.well-known/funding-manifest-urls"
+        },
+        "repositoryUrl": {
+            "url": "https://github.com/PeoplePlusAI/Sukoon",
+            "wellKnown": "https://github.com/PeoplePlusAI/Sukoon/blob/main/.well-known/funding-manifest-urls"
+        },
+        "licenses": ["spdx:MIT"],
+        "tags": [
+            "mental-health",
+            "healthcare",
+            "ai",
+            "llm",
+            "india",
+            "social-impact",
+            "privacy",
+            "multilingual"
+        ]
+    }],
+    "funding": {
+        "channels": [
+            {
+                "guid": "cheque",
+                "type": "cheque",
+                "address": "https://github.com/sponsors/PeoplePlusAI",
+                "description": "Support Sukoon's development through GitHub Sponsors"
+            }
+        ],
+        "plans": [
+            {
+                "guid": "infrastructure-monthly",
+                "status": "active",
+                "name": "Infrastructure Support",
+                "description": "Helps cover monthly costs for API usage, server hosting, and infrastructure maintenance.",
+                "amount": 41500,
+                "currency": "INR",
+                "frequency": "monthly",
+                "channels": ["cheque"]
+            },
+            {
+                "guid": "development-fund",
+                "status": "active",
+                "name": "Development Fund",
+                "description": "Supports ongoing development, including AI model fine-tuning, multilingual support expansion, and new feature development.",
+                "amount": 166000,
+                "currency": "INR",
+                "frequency": "monthly",
+                "channels": ["cheque"]
+            },
+            {
+                "guid": "one-time-support",
+                "status": "active",
+                "name": "One-time Contribution",
+                "description": "Make a one-time contribution of any amount to support Sukoon's mission of making mental health support accessible to all.",
+                "amount": 0,
+                "currency": "INR",
+                "frequency": "one-time",
+                "channels": ["cheque"]
+            }
+        ],
+        "history": [
+            {
+                "year": 2024,
+                "income": 0,
+                "expenses": 0,
+                "taxes": 0,
+                "currency": "INR",
+                "description": "Project launched and opened for community funding"
+            }
+        ]
+    }
+}
