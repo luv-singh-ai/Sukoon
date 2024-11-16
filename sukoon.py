@@ -24,8 +24,6 @@ import pandas as pd
 import sqlite3
 from typing import List, Dict
 from pathlib import Path
-# PLEASE READ THIS DOC ON MEMORY
-# https://langchain-ai.github.io/langgraph/concepts/memory/#managing-long-conversation-history
 
 from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv())
@@ -35,26 +33,6 @@ LANGCHAIN_API_KEY = os.getenv("LANGCHAIN_API_KEY")
 PORTKEY_API_KEY = os.getenv("PORTKEY_API_KEY")
 PORTKEY_VIRTUAL_KEY = os.getenv("PORTKEY_VIRTUAL_KEY")
 PORTKEY_VIRTUAL_KEY_A = os.getenv("PORTKEY_VIRTUAL_KEY_A")
-# # define memory object
-# in_memory_store = InMemoryStore()
-
-# to use ollama via ollama pull llama3.1
-# %pip install -qU langchain-ollama
-# from langchain_ollama import ChatOllama
-# model_o = ChatOllama(
-#     model="llama3.1:405b",
-#     temperature=0.9,
-#     # other params...
-# )
-
-# LANGCHAIN_TRACING_V2=True
-# LANGCHAIN_ENDPOINT="https://api.smith.langchain.com"
-# LANGCHAIN_API_KEY=LANGCHAIN_API_KEY
-# LANGCHAIN_PROJECT="default"
-
-# Define the state
-class State(TypedDict):
-    messages: Annotated[list[AnyMessage], add_messages]
 
 def load_prompts(file_path='prompts.yaml'):
     with open(file_path, 'r') as file:
@@ -62,6 +40,7 @@ def load_prompts(file_path='prompts.yaml'):
 
 prompts = load_prompts()
 
+# PORTKEY IMPLEMENTATION
 portkey_handler = LangchainCallbackHandler(
     api_key=PORTKEY_API_KEY,
     metadata={
@@ -105,19 +84,11 @@ model_a = ChatOpenAI(
     max_retries=2,
 )
 
-# TO ADD WEIGHTED FEEDBACK
-# portkey = Portkey(
-#     api_key="PORTKEY_API_KEY"
-# )
-# feedback = portkey.feedback.create(
-#     trace_id="Router_Agent", # similar for other agents
-#     value=1,  # for thumbs up or thumbs down
-#     weight=1,  # Optional
-#     metadata={
-#         # Pass any additional context here like comments, _user and more
-#     }
-# )
-# print(feedback)
+# LANGGRAPH IMPLEMENTATION STARTS
+# Define the state
+class State(TypedDict):
+    messages: Annotated[list[AnyMessage], add_messages]
+
 
 # DEFINING THE PROMPT
 
@@ -201,37 +172,37 @@ def route_query(state: State):
 # Define all agents
 def run_conversational_agent(state: State):
     print("Running conversational agent")
-    convo_model = conversational_prompt | model_a
+    convo_model = conversational_prompt | model # model_a
     response = convo_model.invoke(state["messages"])
     return {"messages": response}
 
 def run_suicide_prevention_agent(state: State):
     print("Running suicide prevention agent")
-    concern_model = suicide_prevention_prompt | model_a
+    concern_model = suicide_prevention_prompt | model # model_a
     response = concern_model.invoke(state["messages"])
     return {"messages": response}
 
 def run_anger_management_agent(state: State):
     print("Running anger management agent")
-    anger_model = anger_management_prompt | model_a
+    anger_model = anger_management_prompt | model # model_a
     response = anger_model.invoke(state["messages"])
     return {"messages": response}
 
 def run_motivational_agent(state: State):
     print("Running motivational agent")
-    motivation_model = motivational_prompt | model_a
+    motivation_model = motivational_prompt | model # model_a
     response = motivation_model.invoke(state["messages"])
     return {"messages": response}
 
 def run_dialectical_behavior_therapy_agent(state: State):
     print("Running dialectical_behavior_therapy agent")
-    dialectical_behavior_therapy_model = dialectical_behavior_therapy_prompt | model_a
+    dialectical_behavior_therapy_model = dialectical_behavior_therapy_prompt | model # model_a
     response = dialectical_behavior_therapy_model.invoke(state["messages"])
     return {"messages": response}
 
 def run_cognitive_behavioral_therapy_agent(state: State):
     print("Running cognitive_behavioral_therapy agent")
-    cognitive_behavioral_therapy_model = cognitive_behavioral_therapy_prompt | model_a
+    cognitive_behavioral_therapy_model = cognitive_behavioral_therapy_prompt | model # model_a
     response = cognitive_behavioral_therapy_model.invoke(state["messages"])
     return {"messages": response}
 
@@ -255,6 +226,7 @@ def run_cognitive_behavioral_therapy_agent(state: State):
 #         [{"type": "system", "content": system_msg}] + state["messages"]
 #     )
 #     return {"messages": response}
+
 # Create the graph
 workflow = StateGraph(State)
 
@@ -311,3 +283,38 @@ if __name__ == "__main__":
         # print("Bot:", response.content)
         response = chat(user_input, config)
         print("Sukoon:", response.content)
+        
+# TODO:
+# PLEASE READ THIS DOC ON MEMORY
+# https://langchain-ai.github.io/langgraph/concepts/memory/#managing-long-conversation-history
+# # define memory object
+# in_memory_store = InMemoryStore()
+
+# to use ollama via ollama pull llama3.1
+# %pip install -qU langchain-ollama
+# from langchain_ollama import ChatOllama
+# model_o = ChatOllama(
+#     model="llama3.1:405b",
+#     temperature=0.9,
+#     # other params...
+# )
+
+# TO ADD LANGCHAIN TRACING
+# LANGCHAIN_TRACING_V2=True
+# LANGCHAIN_ENDPOINT="https://api.smith.langchain.com"
+# LANGCHAIN_API_KEY=LANGCHAIN_API_KEY
+# LANGCHAIN_PROJECT="default"
+
+# TO ADD WEIGHTED FEEDBACK USING PORTKEY
+# portkey = Portkey(
+#     api_key="PORTKEY_API_KEY"
+# )
+# feedback = portkey.feedback.create(
+#     trace_id="Router_Agent", # similar for other agents
+#     value=1,  # for thumbs up or thumbs down
+#     weight=1,  # Optional
+#     metadata={
+#         # Pass any additional context here like comments, _user and more
+#     }
+# )
+# print(feedback)
