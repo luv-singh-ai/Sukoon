@@ -1,10 +1,36 @@
+# version: '3.8'
+
+# services:
+#   sukoon-backend:
+#     build: .
+#     ports:
+#       - "8002:8001" # 8001 is our internal port
+#     volumes:
+#       - .:/app
+#       - ./data:/app/data  # For any data files
+#       - ./storage:/app/storage  # For vector store persistence
+#     environment:
+#       - PYTHONPATH=/app
+#       - HOST=0.0.0.0
+#       - PORT=8001
+#       # Add your other environment variables here
+#       - OPENAI_API_KEY=${OPENAI_API_KEY}
+#       - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
+#       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+#     restart: unless-stopped
+#   sukoon-frontend:
+#     build: ./frontend-vite # ./sukoon-frontend for earlier version
+#     ports:
+#       - "3002:5173" # "3002:3000" for earlier version
+#     restart: unless-stopped
+
 version: '3.8'
 
 services:
   sukoon-backend:
     build: .
     ports:
-      - "8002:8001" # 8001 is our internal port
+      - "8002:8001"
     volumes:
       - .:/app
       - ./data:/app/data  # For any data files
@@ -16,10 +42,9 @@ services:
       # Add your other environment variables here
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
     restart: unless-stopped
   sukoon-frontend:
-    build: ./frontend-vite # ./sukoon-frontend for earlier version
+    build: ./sukoon-frontend
     ports:
-      - "3002:5173" # "3002:3000" for earlier version
+      - "3002:3000"
     restart: unless-stopped
