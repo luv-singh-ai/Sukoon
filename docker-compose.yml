@@ -43,6 +43,9 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - PORTKEY_API_KEY=${PORTKEY_API_KEY}
+      - PORTKEY_VIRTUAL_KEY=${PORTKEY_VIRTUAL_KEY}
+      - PORTKEY_VIRTUAL_KEY_A=${PORTKEY_VIRTUAL_KEY_A}
     restart: unless-stopped
   sukoon-frontend:
     build: ./sukoon-frontend
