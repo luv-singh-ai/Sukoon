@@ -113,6 +113,27 @@ Or with yarn:
 yarn preview
 ```
 
+## Build Docker image
+The Dockerfile uses multistage build images to build the React app and an Nginx server to serve it at port `80` of the container.
+
+- The build stage is only for building the react application, which eliminates the risk of exposing the secrets provided via the build args, and then the build files are copied from it.
+
+### 1. Build the image
+
+You can build the image locally using the following command:
+
+```bash
+docker build --build-arg SUPABASE_API_KEY="<api-key>" --build-arg SUPABASE_AUTHORIZATION_TOKEN="<authorization-token>" -t <image-name>:<tag> .
+```
+
+### 2. Run the image
+
+Run the image locally at port `8080`:
+
+```bash
+docker run -p 8080:80 <image-name>:<tag>
+```
+
 ## Project Structure
 
 The project structure is as follows:
