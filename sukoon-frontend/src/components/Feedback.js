@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-import Form from 'react-bootstrap/Form';
-import { Modal, Button } from 'react-bootstrap';
-
-
+// import Form from 'react-bootstrap/Form';
+import { Modal, Button, Form } from 'react-bootstrap';
 
 const Feedback = ({ show, setShowModal, act, thumbUpBtn, thumbDownBtn, status, setStatus }) => {
   const [feedback, setFeedback] = useState('');
