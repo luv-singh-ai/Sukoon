@@ -85,7 +85,7 @@
 }
 
 .chatConv {
-  width: 70%;
+  width: 100%;
   /* background-color: lightgreen; */
 }
 
@@ -148,4 +148,17 @@ input:focus-visible {
 .agentMsg {
   width: 50%;
   float: left;
+}
+
+.like, .dislike {
+  cursor: pointer;
+}
+
+.recommandQuery .item {
+  background-color: #fcfbfb;
+  cursor: pointer;
+}
+.recommandQuery i {
+  position: relative;
+  top: 2px;
 }

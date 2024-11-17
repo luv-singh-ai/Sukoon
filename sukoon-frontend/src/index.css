@@ -11,3 +11,9 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* Remove border and shadow on focus */
+input:focus, textarea:focus, select:focus {
+  border: 1px solid !important;  /* Remove border */
+  box-shadow: none !important;  /* Remove shadow */
+}
