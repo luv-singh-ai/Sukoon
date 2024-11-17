@@ -74,8 +74,8 @@ function App() {
       <div className="chat-container" style={{ display: "flex" }}>
         {/* <Menu /> */}
         {/* If Menu Show in page the .chatConv width is 70% other wise width is 100% */}
-        <div class={`chatConv d-flex justify-content-center pt-4 pe-4 ${!messages.length ? "align-items-center" : ""}`} style={{ height: "70vh", overflow: "scroll", overflowX: "auto" }}>
-          <div class="col-6 mx-auto" style={{ overflow: "hidden" }}>
+        <div class={`chatConv justify-content-center pt-4 pe-4 ${!messages.length ? "align-items-center d-flex" : ""}`} style={{ height: "70vh", overflow: "scroll", overflowX: "auto" }}>
+          <div class="col-6 mx-auto">
             <div>
               {messages.map((message, index) => (
                 <div className={`m-4 ${message.user ? 'text-end' : 'text-start'}`} key={index}><span className={`p-2 me-3 my-1 rounded-3 ${message.user ? 'bg-primary text-light' : ''}`} style={{ display: 'inline-block' }}>{message.text}</span></div>
