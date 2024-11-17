@@ -50,7 +50,7 @@ function App() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("https://sukoon-api.pplus.ai/query", {
+      const response = await fetch("http://0.0.0.0:8001/query", { //https://sukoon-api.pplus.ai/query
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
