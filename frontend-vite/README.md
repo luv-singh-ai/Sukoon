@@ -139,3 +139,5 @@ Here are the available yarn scripts:
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a pull request or open an issue for any bugs or feature requests.
+
+Please try the Sukoon app and give us feedback by clicking the like/dislike button.
