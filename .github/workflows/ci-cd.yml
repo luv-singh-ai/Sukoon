@@ -92,6 +92,9 @@ jobs:
 #     env:
 #       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 #       LANGCHAIN_API_KEY: ${{ secrets.LANGCHAIN_API_KEY }}
+#       PORTKEY_API_KEY: ${{ secrets.PORTKEY_API_KEY }}
+#       PORTKEY_VIRTUAL_KEY: ${{ secrets.PORTKEY_VIRTUAL_KEY }}
+#       PORTKEY_VIRTUAL_KEY_A: ${{ secrets.PORTKEY_VIRTUAL_KEY_A }}
 #     steps:
 #     - uses: actions/checkout@v4
 
@@ -217,8 +220,11 @@ jobs:
 
 #     - name: Start API server
 #       env:
-#         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-#         LANGCHAIN_API_KEY: ${{ secrets.LANGCHAIN_API_KEY }}
+#       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+#       LANGCHAIN_API_KEY: ${{ secrets.LANGCHAIN_API_KEY }}
+#       PORTKEY_API_KEY: ${{ secrets.PORTKEY_API_KEY }}
+#       PORTKEY_VIRTUAL_KEY: ${{ secrets.PORTKEY_VIRTUAL_KEY }}
+#       PORTKEY_VIRTUAL_KEY_A: ${{ secrets.PORTKEY_VIRTUAL_KEY_A }}
 #       run: |
 #         nohup uvicorn sukoon_api:app --host 127.0.0.1 --port 8001 &
 
