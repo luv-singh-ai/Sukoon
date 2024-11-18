@@ -50,5 +50,5 @@ services:
   sukoon-frontend:
     build: ./sukoon-frontend
     ports:
-      - "3002:3000"
+      - "3002:80"
     restart: unless-stopped
