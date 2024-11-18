@@ -41,6 +41,10 @@ async def process_query(request: SukoonRequest):
 async def root():
     return {"message": "Welcome to the Sukoon API. Use the /query endpoint to interact with the system."}
 
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy"}
+
 # async def redirect_root_to_docs():
 #     return RedirectResponse("/docs")
 
