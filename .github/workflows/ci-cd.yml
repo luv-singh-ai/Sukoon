@@ -38,10 +38,10 @@ jobs:
           mkdir -p logs
           mkdir -p test_reports
 
-      # # Run the main sukoon tests
-      # - name: Run Sukoon tests
-      #   run: |
-      #     pytest tests/test_sukoon.py -v --html=test_reports/sukoon_report.html
+      # Run the main sukoon tests
+      - name: Run Sukoon tests
+        run: |
+          pytest tests/test_sukoon.py -v --html=test_reports/sukoon_report.html
 
       # Run the API tests
       - name: Run API tests
