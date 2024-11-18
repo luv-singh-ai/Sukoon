@@ -21,7 +21,7 @@ export default function Conversation({
               <div className='h-[10vh] flex items-end justify-center'>
                 <div className='w-full md:w-10/12 lg:w-9/12 xl:w-1/2'>
                   <InputForm isResponseGenerating={isResponseGenerating} prompt={prompt}
-                    setPrompt={setPrompt} submitPrompt={submitPrompt} />
+                    setPrompt={setPrompt} submitPrompt={submitPrompt} showSuggestions={false} />
                 </div>
               </div>
             </div>
