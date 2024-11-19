@@ -11,14 +11,12 @@ export default function LandingPage() {
   const [messages, setMessages] = useState([]);
   const [isResponseGenerating, setIsResponseGenerating] = useState(false);
 
-  const submitPrompt = async e => {
-    e.preventDefault();
-
+  const submitPrompt = async (prompt) => {
     setIsResponseGenerating(true);
 
-    setPrompt("");
-
     setMessages(messages => [...messages, {message: prompt, isResponse: false}]);
+
+    setPrompt("");
 
     const backendUrl = `${RemoveTrailingSlash(BACKEND_ENDPOINT)}/query`
 
