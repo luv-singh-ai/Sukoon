@@ -37,7 +37,7 @@ export default function InputForm({prompt, setPrompt, submitPrompt, isResponseGe
       </form>
       <div className="mt-2 md:mt-3">
         <p className="text-center text-xs md:text-sm text-slate-400">
-          By using this, you give your consent that you have read the <a className="text-blue-500" href="https://peopleplusai.github.io/Sukoon/disclaimer.html" target='_blank' rel="noopener noreferrer">disclaimer</a>.
+          NONE OF YOUR CONVERSATIONS ARE BEING STORED OR USED TO TRAIN OUR MODELS. WE'RE AN OPEN SOURCE SOLUTION. By using this, you give your consent that you have read the <a className="text-blue-500" href="https://peopleplusai.github.io/Sukoon/disclaimer.html" target='_blank' rel="noopener noreferrer">disclaimer</a>.
         </p>
       </div>
     </>
