@@ -40,6 +40,8 @@ def load_prompts(file_path='prompts.yaml'):
 
 prompts = load_prompts()
 
+# in_memory_store = InMemoryStore()
+
 # PORTKEY IMPLEMENTATION
 portkey_handler = LangchainCallbackHandler(
     api_key=PORTKEY_API_KEY,
@@ -78,9 +80,9 @@ model_a = ChatOpenAI(
         provider="anthropic",
         # anthropic_beta="prompt-caching-2024-07-31", # to add cache, add "cache_control": {"type": "ephemeral"} in respective message body
     ),
-    model="claude-3-5-haiku-20241022",
+    model="claude-3-5-sonnet-latest", #claude-3-5-haiku-20241022
     temperature=0.9,
-    max_tokens = 200,
+    max_tokens = 150,
     max_retries=2,
 )
 
