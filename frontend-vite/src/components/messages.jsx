@@ -23,17 +23,17 @@ export default function Messages({
         messages.map((message, i) => {
           if (message.isResponse !== true) {
             return (
-              <div key={i} style={{backgroundColor: "rgba(255, 229, 180, 0.5)"}}
+              <div key={i} style={{backgroundColor: "rgba(167, 199, 231, 0.6)"}}
                 className="mt-5 max-w-60 sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl p-2 px-5 mb-5 rounded-l-3xl rounded-y-3xl rounded-tr-3xl clear-both float-right">
-                <p className="text-sm md:text-md text-wrap">{message.message}</p>
+                <p className="text-sm md:text-base text-wrap">{message.message}</p>
               </div>
             );
           } else {
             return (
               <div key={i}>
-                <div style={{backgroundColor: "rgba(255, 229, 180, 0.5)"}}
+                <div style={{backgroundColor: "rgba(255, 229, 180, 0.6)"}}
                   className="relative w-5/6 xl:w-2/3 p-2 px-5 mb-5 rounded-r-3xl rounded-y-3xl rounded-tl-3xl clear-both">
-                  <p className="text-sm md:text-md text-wrap">{message.message}</p>
+                  <p className="text-sm md:text-base text-wrap">{message.message}</p>
                   <img src={likedMessages.includes(i) ? ThumbsUpFilled : ThumbsUpOutline}
                     onClick={() => {
                       if (likedMessages.includes(i) === false) {

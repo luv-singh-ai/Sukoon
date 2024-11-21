@@ -12,6 +12,7 @@ jobs:
     env:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      LANGCHAIN_API_KEY: ${{ secrets.LANGCHAIN_API_KEY}}
       PORTKEY_API_KEY: ${{ secrets.PORTKEY_API_KEY }}
       PORTKEY_VIRTUAL_KEY: ${{ secrets.PORTKEY_VIRTUAL_KEY }}
       PORTKEY_VIRTUAL_KEY_A: ${{ secrets.PORTKEY_VIRTUAL_KEY_A }}
@@ -31,37 +32,23 @@ jobs:
           pip install pytest pytest-asyncio httpx fastapi uvicorn
           pip install -r requirements.txt
 
-      - name: Create test file
+      # Create logs directory for test outputs
+      - name: Create directories
         run: |
-          cat > test_api.py << EOL
-          import pytest
-          from fastapi.testclient import TestClient
-          from sukoon_api import app
+          mkdir -p logs
+          mkdir -p test_reports
 
-          client = TestClient(app)
-
-          def test_health_endpoint():
-              response = client.get("/health")
-              assert response.status_code == 200
-              assert response.json() == {"status": "healthy"}
-
-          def test_root_endpoint():
-              response = client.get("/")
-              assert response.status_code == 200
-              assert "message" in response.json()
-
-          def test_query_endpoint():
-              test_input = {"input": "Hello"}
-              response = client.post("/query", json=test_input)
-              assert response.status_code == 200
-              assert "output" in response.json()
-              assert isinstance(response.json()["output"], str)
-          EOL
-
-      - name: Run tests
+      # Run the main sukoon tests
+      - name: Run Sukoon tests
         run: |
-          pytest test_api.py -v
+          pytest tests/test_sukoon.py -v --html=test_reports/sukoon_report.html
 
+      # Run the API tests
+      - name: Run API tests
+        run: |
+          pytest tests/test_api.py -v --html=test_reports/api_report.html
+
+      # Start the FastAPI server and test live endpoints
       - name: Start FastAPI server
         run: |
           nohup python sukoon_api.py &
@@ -71,6 +58,63 @@ jobs:
         run: |
           curl -f http://0.0.0.0:8001/health || exit 1
           curl -f http://0.0.0.0:8001/ || exit 1
+          
+          # Test query endpoint with actual input
+          curl -X POST -H "Content-Type: application/json" \
+            -d '{"input":"Hello"}' \
+            http://0.0.0.0:8001/query || exit 1
+
+      # Upload test reports and logs as artifacts
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-reports
+          path: |
+            test_reports/
+            logs/
+          retention-days: 5
+
+      # - name: Create test file
+      #   run: |
+      #     cat > test_api.py << EOL
+      #     import pytest
+      #     from fastapi.testclient import TestClient
+      #     from sukoon_api import app
+
+      #     client = TestClient(app)
+
+      #     def test_health_endpoint():
+      #         response = client.get("/health")
+      #         assert response.status_code == 200
+      #         assert response.json() == {"status": "healthy"}
+
+      #     def test_root_endpoint():
+      #         response = client.get("/")
+      #         assert response.status_code == 200
+      #         assert "message" in response.json()
+
+      #     def test_query_endpoint():
+      #         test_input = {"input": "Hello"}
+      #         response = client.post("/query", json=test_input)
+      #         assert response.status_code == 200
+      #         assert "output" in response.json()
+      #         assert isinstance(response.json()["output"], str)
+      #     EOL
+
+      # - name: Run tests
+      #   run: |
+      #     pytest test_api.py -v
+
+      # - name: Start FastAPI server
+      #   run: |
+      #     nohup python sukoon_api.py &
+      #     sleep 5
+
+      # - name: Test live endpoints
+      #   run: |
+      #     curl -f http://0.0.0.0:8001/health || exit 1
+      #     curl -f http://0.0.0.0:8001/ || exit 1
 
 # PREVIOUS VERSION
 # # .github/workflows/ci-cd.yml
