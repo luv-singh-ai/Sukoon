@@ -299,6 +299,26 @@ if __name__ == "__main__":
 #     )
 #     return {"messages": response}
 
+# TO USE LANGFUSE (https://langfuse.com/docs/integrations/langchain/example-python-langgraph#goal-of-this-cookbook): 
+# %pip install langfuse
+# %pip install langchain langgraph langchain_openai langchain_community
+# # get keys for your project from https://cloud.langfuse.com
+# os.environ["LANGFUSE_PUBLIC_KEY"] = "pk-lf-***"
+# os.environ["LANGFUSE_SECRET_KEY"] = "sk-lf-***"
+# os.environ["LANGFUSE_HOST"] = "https://cloud.langfuse.com" # for EU data region
+# # os.environ["LANGFUSE_HOST"] = "https://us.cloud.langfuse.com" # for US data region
+ 
+# # your openai key
+# os.environ["OPENAI_API_KEY"] = "***"
+# from langfuse.callback import CallbackHandler
+#  # config={"callbacks": [langfuse_handler]}
+# # Initialize Langfuse CallbackHandler for Langchain (tracing)
+# langfuse_handler = CallbackHandler()
+ 
+# for s in graph.stream({"messages": [HumanMessage(content = "What is Langfuse?")]},
+#                       config={"callbacks": [langfuse_handler]}):
+#     print(s)
+
 # TO USE OTHER MODELS:
 
 # to use ollama via ollama pull llama3.1
