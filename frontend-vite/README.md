@@ -56,7 +56,7 @@ Using `.env` file:
 ```bash
 VITE_SUPABASE_API_KEY="<API-KEY>"
 VITE_SUPABASE_AUTHORIZATION_TOKEN="<AUTHORIZATION-TOKEN>"
-VITE_BACKEND_ENDPOINT="https://sukoon-api.pplus.ai"
+VITE_BACKEND_ENDPOINT="<API_URL>"
 ```
 
 ### 4. Start the development server

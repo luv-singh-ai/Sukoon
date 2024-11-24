@@ -22,7 +22,12 @@ services:
       - PORTKEY_VIRTUAL_KEY_A=${PORTKEY_VIRTUAL_KEY_A}
     restart: unless-stopped
   sukoon-frontend:
-    build: ./frontend-vite # ./sukoon-frontend for earlier version
+    build:
+      context: ./frontend-vite
+      args:
+        SUPABASE_API_KEY: ${SUPABASE_API_KEY}
+        SUPABASE_AUTHORIZATION_TOKEN: ${SUPABASE_AUTHORIZATION_TOKEN}
+        BACKEND_ENDPOINT: ${BACKEND_ENDPOINT}
     ports:
       - "3002:80" # "3002:3000" for earlier version
     restart: unless-stopped

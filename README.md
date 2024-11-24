@@ -108,7 +108,6 @@ Mental health support in India faces several challenges:
 * Stores the user conversation locally, not on cloud -> ensuring complete privacy
 * Will provide helpful resources for most common mental health problems. However, it'll not prescribe any medicines
 * For training the bot , we can use federated learning
-* Will be available as an API, so interested people can try this and build on top of it, based on their use case
 * Aim is to get national-level adoption
 * If serious, there’ll option to reach out to a psychiatrist or support community groups e.g. peer to peer network
 * Have L1/L2/L3 level of support 
@@ -119,7 +118,6 @@ Mental health support in India faces several challenges:
 * In particular, we can warn users about what not to do - relying on superstitions, isolation, labelling, and other unhelpful tactics
 * Give positive self-affirmation, create safety plan, etc
 * Can we develop Emotional Intelligence that understands not just emotions, but context behind it
-* Can we detect emotional status ike stress level using voice and then provide support
 * Can we create a timeline tracker let’s say six month plan for meditation and track streak
 * Can we give them a phone number they can call to? The bot will mainly listen , empathize and offer safe advice
 

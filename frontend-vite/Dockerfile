@@ -9,12 +9,11 @@ ARG BACKEND_ENDPOINT="https://sukoon-api.pplus.ai/"
 
 # set a working directory
 WORKDIR /app
-COPY . /app
+COPY package*.json /app/
 
 RUN rm -rf node_modules
-
 RUN npm install
-
+COPY . /app
 # build the react application to generate an optimized static build
 # the build files will be stored in 'dist' directory
 RUN VITE_SUPABASE_API_KEY=${SUPABASE_API_KEY} VITE_SUPABASE_AUTHORIZATION_TOKEN=${SUPABASE_AUTHORIZATION_TOKEN} \
