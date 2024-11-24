@@ -208,25 +208,44 @@ motivational_agent = MotivationalAgent(motivational_prompt, model_a, redis_clien
 dbt_agent = DialecticalBehaviorTherapyAgent(dialectical_behavior_therapy_prompt, model_a, redis_client, 'dbt_memories')
 cbt_agent = CognitiveBehavioralTherapyAgent(cognitive_behavioral_therapy_prompt, model_a, redis_client, 'cbt_memories')
 
+def validate_input(message: str) -> bool:
+    """
+    Validates if the input is appropriate for mental health discussion.
+    TODO: Implement comprehensive validation logic using:
+    - Content moderation API
+    - Keyword filtering
+    - Sentiment analysis
+    - Custom LLM classifier
+    """
+    # Placeholder for input validation
+    # I'll add validation logic here
+    inappropriate_keywords = {'hack', 'crack', 'exploit', 'illegal'}
+    return not any(keyword in message.lower() for keyword in inappropriate_keywords)
+
 
 # Define router
 def route_query(state: State):
     class RouteQuery(BaseModel):
         route: Literal[
             "conversational", "suicide_prevention", "anger_management", 
-            "motivational", "dialectical_behavior_therapy", "cognitive_behavioral_therapy", "denial"
+            "motivational", "dialectical_behavior_therapy", "cognitive_behavioral_therapy"
         ] = Field(
             ...,
-            description=(
-                "Think step by step and direct to the most appropriate agent."
-            )
+            description="Think step by step and direct to the most appropriate agent."
         )
+    
+    last_message = state["messages"][-1]
+    
+    # First check if input is valid
+    # if not validate_input(last_message.content):
+    #     return "invalid_input"
+        
     structured_llm_router = model.with_structured_output(RouteQuery)
     question_router = planner_prompt | structured_llm_router
-    last_message = state["messages"][-1]
     resp = question_router.invoke({"input": last_message.content})
     return resp.route
 
+# Create a custom graph class to handle agents
 # Create a custom graph class to handle agents
 class AgentStateGraph(StateGraph):
     def __init__(self, state_type):
@@ -238,18 +257,15 @@ class AgentStateGraph(StateGraph):
             "anger_management": anger_management_agent,
             "motivational": motivational_agent,
             "dialectical_behavior_therapy": dbt_agent,
-            "cognitive_behavioral_therapy": cbt_agent,
-            "denial": None  # Special case for denial
+            "cognitive_behavioral_therapy": cbt_agent
         }
     
     def add_agent_node(self, name: str):
         def agent_runner(state: State):
-            agent = self.agents[name]
-            if agent:
-                return agent.run(state)
-            else:
-                # Handle 'denial' agent separately
+            if name == "invalid_input":
                 return {"messages": [AIMessage(content="Please use this wisely. This space is for mental and emotional well-being. Namaste.")]}
+            agent = self.agents[name]
+            return agent.run(state)
         self.add_node(name, agent_runner)
 # Instantiate the graph
 workflow = AgentStateGraph(State)
@@ -262,7 +278,7 @@ agent_names = [
     "motivational",
     "dialectical_behavior_therapy",
     "cognitive_behavioral_therapy",
-    "denial"
+    # "invalid_input"  # Added as a special routing case
 ]
 
 for agent_name in agent_names:
