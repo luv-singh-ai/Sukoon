@@ -28,29 +28,26 @@ Project Sukoon aims to build open-source solutions and standards for using AI to
 
 1. Prototyped with [Crew AI agent framework](https://www.crewai.com/)
 2. Developed backend and frontend using [LangGraph framework](https://www.langchain.com/langgraph)
-3. Shifted to [AutoGen framework](https://microsoft.github.io/autogen/docs/tutorial/introduction/) based on expert consultation
-4. Currently addressing web UI issues and agent loop problems with AutoGen
-5. Planning to create API endpoints for LangGraph and integrate with WhatsApp API
-6. Iterated and added more agents to the pipeline
+3. Tried [AutoGen framework](https://microsoft.github.io/autogen/docs/tutorial/introduction/) but due to web UI issues, did not deployed this
+4. Completed v3 of our Sukoon chatbot and deployed in IIT Kanpur, others.
+5. Created API endpoints for LangGraph and framework for integrating with WhatsApp API
 
 [Watch the video](https://drive.google.com/file/d/1zFL8nz0d8aqzHxJhFU0h-ScDdFaSkPeT/view?usp=drive_link)
 
 ## Installation
 
 ### Technical Architecture
-![Technical Architecture](archive/tech_arch_latest.png)
+![Technical Architecture](archive/sukoon_tech_arch_1x.png)
 
-This is Langgraph code. Code from AutoGen is in different branch.
-
-# LangGraph (Current Version)
+# LangGraph (`main` branch )
 ```
-- Go to langgraph branch
+- clone the repo and create a virutal environement. Create a `.env` file and put in your secret keys like OpenAI keys
 - install all dependencies in your environment (pip install -r requirements.txt)
-- run 'python sukoon_api.py' 
-- go to sukoon-frontend(cd sukoon-frontend), run 'npm start' to access it in your browser.
-- alternatively use this vercel deployment to access it - https://sukoon-1.vercel.app
+- To use the API, run 'python sukoon_api.py'. else run `python.py` to run it in terminal
+- To use web UI, cd to `sukoon-frontend`, run 'npm start' to access it in your browser. 
+- There's a newer frontend version in `frontend-vite` folder. To use this, cd to this and run `npm run dev` to view it locally.
+- alternatively use this vercel deployment to access it - https://sukoon-1.vercel.app (might be stopped in future)
 ```
-
 ## Steps to add environment variables - 
 Create a .env file with:
 ```
@@ -58,6 +55,8 @@ OPENAI_API_KEY = '<YOUR_OPENAI_API_KEY>'
 ANTHROPIC_API_KEY = '<ANTHROPIC_API_KEY>'
 LANGCHAIN_API_KEY = '<YOUR_LANGCHAIN_API_KEY>'
 ```
+- Add portkey if you want to add observability
+
 - Alternatively , try this:
 ```
 On Mac/Linux -
@@ -70,7 +69,7 @@ setx OPENAI_API_KEY "your_api_key_here"
 # How to contribute 🤝
 There are few ways you can contribute to Sukoon
 
-- By providing feedback on the POC
+- By providing feedback on the Sukoon Chatbot
 - By helping in testing and evaluation(please find relevant code in `tests` and `evals` folder)
 - By raising issues in the issues section
 - By contributing to the codebase based on the issues
