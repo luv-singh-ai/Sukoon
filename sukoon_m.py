@@ -8,7 +8,7 @@ from langgraph.checkpoint.memory import MemorySaver
 from typing import TypedDict, List
 from openai import OpenAI
 from langchain_openai import ChatOpenAI
-from langgraph.store.memory import InMemoryStore
+# from langgraph.store.memory import InMemoryStore
 from typing_extensions import TypedDict
 from langchain_core.runnables import RunnableConfig
 from langgraph.store.base import BaseStore
@@ -16,6 +16,7 @@ from portkey_ai import Portkey, createHeaders, PORTKEY_GATEWAY_URL
 from portkey_ai.langchain import LangchainCallbackHandler
 from langchain_anthropic import ChatAnthropic
 
+import redis
 import os
 import yaml, uuid
 import json
@@ -41,7 +42,10 @@ def load_prompts(file_path='prompts.yaml'):
 prompts = load_prompts()
 
 # define memory object
-in_memory_store = InMemoryStore()
+# in_memory_store = InMemoryStore()
+# Initialize Redis client
+redis_client = redis.Redis(host='localhost', port=6379, db=0)
+
 
 # PORTKEY IMPLEMENTATION
 portkey_handler = LangchainCallbackHandler(
@@ -93,71 +97,93 @@ class State(TypedDict):
     messages: Annotated[list[AnyMessage], add_messages]
 
 # Create the base Agent class
+# Base Agent class using Redis
 class Agent:
-    def __init__(self, prompt_template, model, store: BaseStore):
+    def __init__(self, prompt_template, model, redis_client, namespace):
         self.prompt_template = prompt_template
         self.model = model
-        self.store = store
-        self.namespace = ("memories", "123")  # Using the same namespace across agents
-        # Clear memory when a new object is created
-        for key in list(self.store.store.keys()):
-            if key[0] == self.namespace[0] and key[1] == self.namespace[1]:
-                del self.store.store[key]
-    
+        self.redis_client = redis_client
+        self.namespace = namespace
+        # Clear the Redis list when a new object is created
+        self.redis_client.delete(self.namespace)
+
     def run(self, state: State):
         print(f"Running {self.__class__.__name__}")
-        # Retrieve the last 6 memories if available
-        memories = self.store.search(self.namespace)
-        last_memories = memories[-6:] if len(memories) > 6 else memories
-        info = "\n".join([d.value["data"] for d in last_memories])
+        # Retrieve the last 2 conversations from Redis
+        memories = self.redis_client.lrange(self.namespace, -2, -1)
+        memories = [memory.decode('utf-8') for memory in memories]
+        info = "\n".join(memories)
         # Incorporate memories into the system message
         system_msg = self.prompt_template.format(input="{input}") + f"\nTake into account these past conversations: {info}"
         response = self.model.invoke(
             [{"type": "system", "content": system_msg}] + state["messages"]
         )
-        # Store new memories unconditionally or based on specific criteria
-        # last_message = state["messages"][-1]
-        # if "remember" in last_message.content.lower():
+        # Store the new conversation in Redis
         memory = str(response)
-        self.store.put(self.namespace, str(uuid.uuid4()), {"data": memory})
+        self.redis_client.rpush(self.namespace, memory)
+        # Trim the list to keep only the last 2 conversations
+        self.redis_client.ltrim(self.namespace, -2, -1)
         return {"messages": response}
+
+# class Agent:
+#     def __init__(self, prompt_template, model, store: BaseStore):
+#         self.prompt_template = prompt_template
+#         self.model = model
+#         self.store = store
+#         self.namespace = ("memories", "123")  # Using the same namespace across agents
+#         # Clear memory when a new object is created
+#         # for key in list(self.store.store.keys()):
+#         #     if key[0] == self.namespace[0] and key[1] == self.namespace[1]:
+#         #         del self.store.store[key]
+    
+#     def run(self, state: State):
+#         print(f"Running {self.__class__.__name__}")
+#         # Retrieve the last 6 memories if available
+#         memories = self.store.search(self.namespace)
+#         last_memories = memories[-6:] if len(memories) > 6 else memories
+#         info = "\n".join([d.value["data"] for d in last_memories])
+#         # Incorporate memories into the system message
+#         system_msg = self.prompt_template.format(input="{input}") + f"\nTake into account these past conversations: {info}"
+#         response = self.model.invoke(
+#             [{"type": "system", "content": system_msg}] + state["messages"]
+#         )
+#         # Store new memories unconditionally or based on specific criteria
+#         # last_message = state["messages"][-1]
+#         # if "remember" in last_message.content.lower():
+#         memory = str(response)
+#         self.store.put(self.namespace, str(uuid.uuid4()), {"data": memory})
+#         return {"messages": response}
 
 # DEFINING THE PROMPT
 
-planner_prompt = ChatPromptTemplate.from_messages([
-    ("system", prompts['planner_agent_prompt']),
-    ("human", "{input}"),
-])
+# Define mapping of prompt names to their corresponding prompt keys in the prompts dict
+prompt_configs = {
+    'planner': 'planner_agent_prompt',
+    'conversational': 'empathetic_agent_prompt', 
+    'suicide_prevention': 'suicide_prevention_agent_prompt',
+    'anger_management': 'anger_prevention_agent_prompt',
+    'motivational': 'motivational_agent_prompt',
+    'dialectical_behavior_therapy': 'dbt_agent_prompt',
+    'cognitive_behavioral_therapy': 'cbt_agent_prompt'
+}
 
-conversational_prompt = ChatPromptTemplate.from_messages([
-    ("system", prompts['empathetic_agent_prompt']),
-    ("human", "{input}"),
-])
+# Create prompts using a dictionary comprehension
+prompts_dict = {
+    f"{name}_prompt": ChatPromptTemplate.from_messages([
+        ("system", prompts[prompt_key]),
+        ("human", "{input}")
+    ])
+    for name, prompt_key in prompt_configs.items()
+}
 
-suicide_prevention_prompt = ChatPromptTemplate.from_messages([
-    ("system", prompts['suicide_prevention_agent_prompt']),
-    ("human", "{input}"),
-])
-
-anger_management_prompt = ChatPromptTemplate.from_messages([
-    ("system", prompts['anger_prevention_agent_prompt']),
-    ("human", "{input}"),
-])
-
-motivational_prompt = ChatPromptTemplate.from_messages([
-    ("system", prompts['motivational_agent_prompt']),
-    ("human", "{input}"),
-])
-
-dialectical_behavior_therapy_prompt = ChatPromptTemplate.from_messages([
-    ("system", prompts['dbt_agent_prompt']),
-    ("human", "{input}")
-])
-
-cognitive_behavioral_therapy_prompt = ChatPromptTemplate.from_messages([
-    ("system", prompts['cbt_agent_prompt']),
-    ("human", "{input}")
-])
+# Unpack the prompts into individual variables
+planner_prompt = prompts_dict['planner_prompt']
+conversational_prompt = prompts_dict['conversational_prompt']
+suicide_prevention_prompt = prompts_dict['suicide_prevention_prompt']
+anger_management_prompt = prompts_dict['anger_management_prompt']
+motivational_prompt = prompts_dict['motivational_prompt']
+dialectical_behavior_therapy_prompt = prompts_dict['dialectical_behavior_therapy_prompt']
+cognitive_behavioral_therapy_prompt = prompts_dict['cognitive_behavioral_therapy_prompt']
 
 # Define subclasses for each specific agent
 class ConversationalAgent(Agent):
@@ -174,19 +200,18 @@ class CognitiveBehavioralTherapyAgent(Agent):
     pass  # Inherits from Agent
 
 # Initialize agent instances with their respective prompts and models
-conversational_agent = ConversationalAgent(conversational_prompt, model, in_memory_store)
-suicide_prevention_agent = SuicidePreventionAgent(suicide_prevention_prompt, model_a, in_memory_store)
-anger_management_agent = AngerManagementAgent(anger_management_prompt, model_a, in_memory_store)
-motivational_agent = MotivationalAgent(motivational_prompt, model_a, in_memory_store)
-dbt_agent = DialecticalBehaviorTherapyAgent(dialectical_behavior_therapy_prompt, model_a, in_memory_store)
-cbt_agent = CognitiveBehavioralTherapyAgent(cognitive_behavioral_therapy_prompt, model_a, in_memory_store)
+# Initialize agent instances with their respective prompts and models
+conversational_agent = ConversationalAgent(conversational_prompt, model, redis_client, 'conversational_memories')
+suicide_prevention_agent = SuicidePreventionAgent(suicide_prevention_prompt, model_a, redis_client, 'suicide_memories')
+anger_management_agent = AngerManagementAgent(anger_management_prompt, model_a, redis_client, 'anger_memories')
+motivational_agent = MotivationalAgent(motivational_prompt, model_a, redis_client, 'motivational_memories')
+dbt_agent = DialecticalBehaviorTherapyAgent(dialectical_behavior_therapy_prompt, model_a, redis_client, 'dbt_memories')
+cbt_agent = CognitiveBehavioralTherapyAgent(cognitive_behavioral_therapy_prompt, model_a, redis_client, 'cbt_memories')
 
 
 # Define router
-# Define the router
 def route_query(state: State):
     class RouteQuery(BaseModel):
-        """Route a user query to the most relevant node based on the emotional or psychological state."""
         route: Literal[
             "conversational", "suicide_prevention", "anger_management", 
             "motivational", "dialectical_behavior_therapy", "cognitive_behavioral_therapy", "denial"
@@ -199,7 +224,7 @@ def route_query(state: State):
     structured_llm_router = model.with_structured_output(RouteQuery)
     question_router = planner_prompt | structured_llm_router
     last_message = state["messages"][-1]
-    resp = question_router.invoke({"input": last_message})
+    resp = question_router.invoke({"input": last_message.content})
     return resp.route
 
 # Create a custom graph class to handle agents
@@ -226,11 +251,6 @@ class AgentStateGraph(StateGraph):
                 # Handle 'denial' agent separately
                 return {"messages": [AIMessage(content="Please use this wisely. This space is for mental and emotional well-being. Namaste.")]}
         self.add_node(name, agent_runner)
-
-def run_denial_agent(state: State):
-    return {"messages": "Please use this wisely. This space is for mental and emotional well-being. Namaste."}
-    # no need to invoke model here as we're just denying the request here
-
 # Instantiate the graph
 workflow = AgentStateGraph(State)
 
@@ -244,7 +264,6 @@ agent_names = [
     "cognitive_behavioral_therapy",
     "denial"
 ]
-
 
 for agent_name in agent_names:
     workflow.add_agent_node(agent_name)
@@ -275,92 +294,4 @@ if __name__ == "__main__":
             print("Sukoon: Goodbye!")
             break
         response = chat(user_input, config)
-        print("Sukoon:", response.content)      
-        
-# # Define all agents
-# def run_conversational_agent(state: State, store: BaseStore):
-#     print("Running conversational agent")
-#     namespace = ("memories", "123")
-#     memories = store.search(namespace)
-#     info = "\n".join([d.value["data"] for d in memories])
-#     system_msg = f"{conversational_prompt} \n Take into account these past conversations: {info}"
-#     response = model.invoke(
-#         [{"type": "system", "content": system_msg}] + state["messages"]
-#     )
-#     # new_conversational_prompt = f"{conversational_prompt} \n Take into account these past conversation into account: {info}"
-#     # convo_model = new_conversational_prompt | model
-#     # response = convo_model.invoke(state["messages"])
-    
-#     # Store new memories if the user asks the model to remember
-#     last_message = state["messages"][-1]
-#     if "remember" in last_message.content.lower() or True: # rn defaults to True in all cases
-#         memory = str(response)
-#         store.put(namespace, str(uuid.uuid4()), {"data": memory})
-#         # store.put(namespace, str(uuid.uuid4()), {"data": memory})
-#     return {"messages": response}
-
-# def run_suicide_prevention_agent(state: State):
-#     print("Running suicide prevention agent")
-#     concern_model = suicide_prevention_prompt | model_a # model
-#     response = concern_model.invoke(state["messages"])
-#     return {"messages": response}
-
-# def run_anger_management_agent(state: State):
-#     print("Running anger management agent")
-#     anger_model = anger_management_prompt | model_a # model
-#     response = anger_model.invoke(state["messages"])
-#     return {"messages": response}
-
-# def run_motivational_agent(state: State):
-#     print("Running motivational agent")
-#     motivation_model = motivational_prompt | model_a # model
-#     response = motivation_model.invoke(state["messages"])
-#     return {"messages": response}
-
-# def run_dialectical_behavior_therapy_agent(state: State):
-#     print("Running dialectical_behavior_therapy agent")
-#     dialectical_behavior_therapy_model = dialectical_behavior_therapy_prompt | model_a # model
-#     response = dialectical_behavior_therapy_model.invoke(state["messages"])
-#     return {"messages": response}
-
-# def run_cognitive_behavioral_therapy_agent(state: State):
-#     print("Running cognitive_behavioral_therapy agent")
-#     cognitive_behavioral_therapy_model = cognitive_behavioral_therapy_prompt | model_a # model
-#     response = cognitive_behavioral_therapy_model.invoke(state["messages"])
-#     return {"messages": response}
-
-# # Add nodes for each agent
-# workflow.add_node("conversational", run_conversational_agent)
-# workflow.add_node("suicide_prevention", run_suicide_prevention_agent)
-# workflow.add_node("anger_management", run_anger_management_agent)
-# workflow.add_node("motivational", run_motivational_agent)
-# # workflow.add_node("mindfulness", run_mindfulness_agent)
-# workflow.add_node("dialectical_behavior_therapy", run_dialectical_behavior_therapy_agent)
-# workflow.add_node("cognitive_behavioral_therapy", run_cognitive_behavioral_therapy_agent)
-# workflow.add_node("denial", run_denial_agent)
-
-# Add edges
-# workflow.add_conditional_edges(
-#     START,
-#     route_query,
-#     {
-#         "conversational": "conversational",
-#         "suicide_prevention": "suicide_prevention",
-#         "anger_management": "anger_management",
-#         "motivational": "motivational",
-#         # "mindfulness": "mindfulness",
-#         "dialectical_behavior_therapy": "dialectical_behavior_therapy",
-#         "cognitive_behavioral_therapy": "cognitive_behavioral_therapy",
-#         "denial": "denial"
-#     }
-# )
-
-# workflow.add_edge("conversational", END)
-# workflow.add_edge("suicide_prevention", END)
-# workflow.add_edge("anger_management", END)
-# workflow.add_edge("motivational", END)
-# # workflow.add_edge("mindfulness", END)
-# workflow.add_edge("dialectical_behavior_therapy", END)
-# workflow.add_edge("cognitive_behavioral_therapy", END)
-# workflow.add_edge("denial", END)
-
+        print("Sukoon:", response.content)
