@@ -19,6 +19,7 @@ httpx
 python-dotenv
 pydantic
 pyyaml
+redis
 #posthog-js
 # langchainhub==0.1.15
 # langchain-openai==0.1.3
